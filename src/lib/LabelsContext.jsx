@@ -93,7 +93,7 @@ export const APP_LABELS = {
   info_translating: 'Translating…',
   info_generating: 'Generating…',
   info_retryGeneration: 'Retry generation',
-  info_downloadPdf: 'Save as PDF',
+  info_downloadPdf: 'Download patient info',
 
   // WallpaperCard
   wallpaper_scanHint: 'Scan for full profile in your language',

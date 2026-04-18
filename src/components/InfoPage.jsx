@@ -10,6 +10,27 @@ import {
   ArrowRightIcon, ArrowLeftIcon, PlayIcon, PauseIcon, DownloadIcon,
 } from './ui'
 
+function downloadTxt(profile, labels) {
+  const lines = [
+    `${labels.info_patient}: ${profile.name}`,
+    `${labels.info_bloodType}: ${profile.bloodType || labels.info_bloodUnknown}`,
+  ]
+  if (profile.allergies)       lines.push(`\n${labels.info_allergies}:\n${profile.allergies}`)
+  if (profile.conditions)      lines.push(`\n${labels.info_conditions}:\n${profile.conditions}`)
+  if (profile.medications)     lines.push(`\n${labels.info_medications}:\n${profile.medications}`)
+  if (profile.emergencyContact || profile.emergencyPhone) {
+    const contact = [profile.emergencyContact, profile.emergencyPhone].filter(Boolean).join(' · ')
+    lines.push(`\n${labels.info_emergencyContact}:\n${contact}`)
+  }
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${profile.name || 'patient'}-medicode.txt`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 const TRANSLATABLE = ['allergies', 'conditions', 'medications']
 const ALERT_TEXT_EN = 'This person has been involved in a medical emergency.'
 
@@ -202,13 +223,8 @@ export default function InfoPage() {
 
   return (
     <div style={{ minHeight: '100dvh', background: 'var(--paper)' }}>
-      <style>{`@media print {
-        .no-print { display: none !important; }
-        body { background: #fff; }
-      }`}</style>
-
       {/* Sticky header */}
-      <div className="no-print" style={{
+      <div style={{
         padding: '14px 20px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         borderBottom: '1px solid var(--line-2)',
@@ -221,20 +237,7 @@ export default function InfoPage() {
           <ArrowLeftIcon size={12} /> {labels.info_exit}
         </button>
         <BrandMark size={16} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button
-            onClick={() => window.print()}
-            title={labels.info_downloadPdf}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 5,
-              fontSize: 12, color: 'var(--ink-3)', cursor: 'pointer',
-              fontFamily: 'var(--mono)', letterSpacing: '0.02em',
-            }}
-          >
-            <DownloadIcon size={13} />
-          </button>
-          <LangPill code={lang} label={langObj.label} onClick={() => setStep('language')} />
-        </div>
+        <LangPill code={lang} label={langObj.label} onClick={() => setStep('language')} />
       </div>
 
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 20px 48px', display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -311,7 +314,7 @@ export default function InfoPage() {
         )}
 
         {/* Voice alert */}
-        <div className="no-print" style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden' }}>
+        <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden' }}>
           <div style={{ padding: '14px 16px 12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <div style={{
@@ -425,6 +428,14 @@ export default function InfoPage() {
             {labels.info_translating}
           </p>
         )}
+
+        <Btn
+          variant="ghost"
+          icon={<DownloadIcon size={15} />}
+          onClick={() => downloadTxt(displayed, labels)}
+        >
+          {labels.info_downloadPdf}
+        </Btn>
 
       </div>
     </div>
