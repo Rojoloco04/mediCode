@@ -1,0 +1,604 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		200001000000000000000000 /* MediCodeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100001000000000000000000 /* MediCodeApp.swift */; };
+		200002000000000000000000 /* MediCodeQuickAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100002000000000000000000 /* MediCodeQuickAction.swift */; };
+		200003000000000000000000 /* MediCodeIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100003000000000000000000 /* MediCodeIntents.swift */; };
+		200004000000000000000000 /* BackendContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100004000000000000000000 /* BackendContracts.swift */; };
+		200005000000000000000000 /* EmergencyProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100005000000000000000000 /* EmergencyProfile.swift */; };
+		200006000000000000000000 /* Routing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100006000000000000000000 /* Routing.swift */; };
+		200007000000000000000000 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100007000000000000000000 /* AppDependencies.swift */; };
+		200008000000000000000000 /* BackendAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100008000000000000000000 /* BackendAPI.swift */; };
+		200009000000000000000000 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100009000000000000000000 /* HealthKitService.swift */; };
+		20000A000000000000000000 /* LocationLanguageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000A000000000000000000 /* LocationLanguageService.swift */; };
+		20000B000000000000000000 /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000B000000000000000000 /* ProfileStore.swift */; };
+		20000C000000000000000000 /* QRCardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000C000000000000000000 /* QRCardService.swift */; };
+		20000D000000000000000000 /* OnboardingFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000D000000000000000000 /* OnboardingFlowView.swift */; };
+		20000E000000000000000000 /* ProfileEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000E000000000000000000 /* ProfileEditorView.swift */; };
+		20000F000000000000000000 /* QRCodeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000F000000000000000000 /* QRCodeCardView.swift */; };
+		200010000000000000000000 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100010000000000000000000 /* RootView.swift */; };
+		200011000000000000000000 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100011000000000000000000 /* Assets.xcassets */; };
+		200012000000000000000000 /* MediCodeWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 10001A000000000000000000 /* MediCodeWidget.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		200013000000000000000000 /* MediCodeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100014000000000000000000 /* MediCodeWidget.swift */; };
+		200014000000000000000000 /* MediCodeQuickAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100002000000000000000000 /* MediCodeQuickAction.swift */; };
+		200015000000000000000000 /* EmergencyProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100005000000000000000000 /* EmergencyProfile.swift */; };
+		200016000000000000000000 /* Routing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100006000000000000000000 /* Routing.swift */; };
+		200017000000000000000000 /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000B000000000000000000 /* ProfileStore.swift */; };
+		200018000000000000000000 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100015000000000000000000 /* Assets.xcassets */; };
+		200019000000000000000000 /* MediCodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100018000000000000000000 /* MediCodeTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		500001000000000000000000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000001000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 400002000000000000000000;
+			remoteInfo = MediCodeWidget;
+		};
+		500002000000000000000000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000001000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 400001000000000000000000;
+			remoteInfo = MediCode;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		300004000000000000000000 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				200012000000000000000000 /* MediCodeWidget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		100001000000000000000000 /* MediCodeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediCodeApp.swift; sourceTree = "<group>"; };
+		100002000000000000000000 /* MediCodeQuickAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediCodeQuickAction.swift; sourceTree = "<group>"; };
+		100003000000000000000000 /* MediCodeIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediCodeIntents.swift; sourceTree = "<group>"; };
+		100004000000000000000000 /* BackendContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendContracts.swift; sourceTree = "<group>"; };
+		100005000000000000000000 /* EmergencyProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmergencyProfile.swift; sourceTree = "<group>"; };
+		100006000000000000000000 /* Routing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routing.swift; sourceTree = "<group>"; };
+		100007000000000000000000 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
+		100008000000000000000000 /* BackendAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendAPI.swift; sourceTree = "<group>"; };
+		100009000000000000000000 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
+		10000A000000000000000000 /* LocationLanguageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationLanguageService.swift; sourceTree = "<group>"; };
+		10000B000000000000000000 /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
+		10000C000000000000000000 /* QRCardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCardService.swift; sourceTree = "<group>"; };
+		10000D000000000000000000 /* OnboardingFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFlowView.swift; sourceTree = "<group>"; };
+		10000E000000000000000000 /* ProfileEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditorView.swift; sourceTree = "<group>"; };
+		10000F000000000000000000 /* QRCodeCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeCardView.swift; sourceTree = "<group>"; };
+		100010000000000000000000 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		100011000000000000000000 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		100012000000000000000000 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		100013000000000000000000 /* MediCode.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MediCode.entitlements; sourceTree = "<group>"; };
+		100014000000000000000000 /* MediCodeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediCodeWidget.swift; sourceTree = "<group>"; };
+		100015000000000000000000 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		100016000000000000000000 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		100017000000000000000000 /* MediCodeWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MediCodeWidget.entitlements; sourceTree = "<group>"; };
+		100018000000000000000000 /* MediCodeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediCodeTests.swift; sourceTree = "<group>"; };
+		100019000000000000000000 /* MediCode.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MediCode.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		10001A000000000000000000 /* MediCodeWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MediCodeWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		10001B000000000000000000 /* MediCodeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MediCodeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		300002000000000000000000 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		300006000000000000000000 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		300009000000000000000000 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		000002000000000000000000 = {
+			isa = PBXGroup;
+			children = (
+				000004000000000000000000 /* MediCode */,
+				000005000000000000000000 /* MediCodeWidget */,
+				000006000000000000000000 /* MediCodeTests */,
+				000003000000000000000000 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		000003000000000000000000 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				100019000000000000000000 /* MediCode.app */,
+				10001A000000000000000000 /* MediCodeWidget.appex */,
+				10001B000000000000000000 /* MediCodeTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		000004000000000000000000 /* MediCode */ = {
+			isa = PBXGroup;
+			children = (
+				100001000000000000000000 /* MediCodeApp.swift */,
+				000007000000000000000000 /* AppIntents */,
+				000008000000000000000000 /* Models */,
+				000009000000000000000000 /* Services */,
+				00000A000000000000000000 /* Views */,
+				100011000000000000000000 /* Assets.xcassets */,
+				100012000000000000000000 /* Info.plist */,
+				100013000000000000000000 /* MediCode.entitlements */,
+			);
+			path = MediCode;
+			sourceTree = "<group>";
+		};
+		000005000000000000000000 /* MediCodeWidget */ = {
+			isa = PBXGroup;
+			children = (
+				100014000000000000000000 /* MediCodeWidget.swift */,
+				100015000000000000000000 /* Assets.xcassets */,
+				100016000000000000000000 /* Info.plist */,
+				100017000000000000000000 /* MediCodeWidget.entitlements */,
+			);
+			path = MediCodeWidget;
+			sourceTree = "<group>";
+		};
+		000006000000000000000000 /* MediCodeTests */ = {
+			isa = PBXGroup;
+			children = (
+				100018000000000000000000 /* MediCodeTests.swift */,
+			);
+			path = MediCodeTests;
+			sourceTree = "<group>";
+		};
+		000007000000000000000000 /* AppIntents */ = {
+			isa = PBXGroup;
+			children = (
+				100002000000000000000000 /* MediCodeQuickAction.swift */,
+				100003000000000000000000 /* MediCodeIntents.swift */,
+			);
+			path = AppIntents;
+			sourceTree = "<group>";
+		};
+		000008000000000000000000 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				100004000000000000000000 /* BackendContracts.swift */,
+				100005000000000000000000 /* EmergencyProfile.swift */,
+				100006000000000000000000 /* Routing.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		000009000000000000000000 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				100007000000000000000000 /* AppDependencies.swift */,
+				100008000000000000000000 /* BackendAPI.swift */,
+				100009000000000000000000 /* HealthKitService.swift */,
+				10000A000000000000000000 /* LocationLanguageService.swift */,
+				10000B000000000000000000 /* ProfileStore.swift */,
+				10000C000000000000000000 /* QRCardService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		00000A000000000000000000 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				10000D000000000000000000 /* OnboardingFlowView.swift */,
+				10000E000000000000000000 /* ProfileEditorView.swift */,
+				10000F000000000000000000 /* QRCodeCardView.swift */,
+				100010000000000000000000 /* RootView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		400001000000000000000000 /* MediCode */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 700002000000000000000000 /* Build configuration list for PBXNativeTarget "MediCode" */;
+			buildPhases = (
+				300001000000000000000000 /* Sources */,
+				300002000000000000000000 /* Frameworks */,
+				300003000000000000000000 /* Resources */,
+				300004000000000000000000 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				600001000000000000000000 /* PBXTargetDependency */,
+			);
+			name = MediCode;
+			productName = MediCode;
+			productReference = 100019000000000000000000 /* MediCode.app */;
+			productType = "com.apple.product-type.application";
+		};
+		400002000000000000000000 /* MediCodeWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 700003000000000000000000 /* Build configuration list for PBXNativeTarget "MediCodeWidget" */;
+			buildPhases = (
+				300005000000000000000000 /* Sources */,
+				300006000000000000000000 /* Frameworks */,
+				300007000000000000000000 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MediCodeWidget;
+			productName = MediCodeWidget;
+			productReference = 10001A000000000000000000 /* MediCodeWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		400003000000000000000000 /* MediCodeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 700004000000000000000000 /* Build configuration list for PBXNativeTarget "MediCodeTests" */;
+			buildPhases = (
+				300008000000000000000000 /* Sources */,
+				300009000000000000000000 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				600002000000000000000000 /* PBXTargetDependency */,
+			);
+			name = MediCodeTests;
+			productName = MediCodeTests;
+			productReference = 10001B000000000000000000 /* MediCodeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		000001000000000000000000 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 2604;
+				TargetAttributes = {
+					400001000000000000000000 = {
+						CreatedOnToolsVersion = 26.4.1;
+					};
+					400002000000000000000000 = {
+						CreatedOnToolsVersion = 26.4.1;
+					};
+					400003000000000000000000 = {
+						CreatedOnToolsVersion = 26.4.1;
+						TestTargetID = 400001000000000000000000;
+					};
+				};
+			};
+			buildConfigurationList = 700001000000000000000000 /* Build configuration list for PBXProject "MediCode" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 000002000000000000000000;
+			productRefGroup = 000003000000000000000000 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				400001000000000000000000 /* MediCode */,
+				400002000000000000000000 /* MediCodeWidget */,
+				400003000000000000000000 /* MediCodeTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		300003000000000000000000 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				200011000000000000000000 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		300007000000000000000000 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				200018000000000000000000 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		300001000000000000000000 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				200001000000000000000000 /* MediCodeApp.swift in Sources */,
+				200002000000000000000000 /* MediCodeQuickAction.swift in Sources */,
+				200003000000000000000000 /* MediCodeIntents.swift in Sources */,
+				200004000000000000000000 /* BackendContracts.swift in Sources */,
+				200005000000000000000000 /* EmergencyProfile.swift in Sources */,
+				200006000000000000000000 /* Routing.swift in Sources */,
+				200007000000000000000000 /* AppDependencies.swift in Sources */,
+				200008000000000000000000 /* BackendAPI.swift in Sources */,
+				200009000000000000000000 /* HealthKitService.swift in Sources */,
+				20000A000000000000000000 /* LocationLanguageService.swift in Sources */,
+				20000B000000000000000000 /* ProfileStore.swift in Sources */,
+				20000C000000000000000000 /* QRCardService.swift in Sources */,
+				20000D000000000000000000 /* OnboardingFlowView.swift in Sources */,
+				20000E000000000000000000 /* ProfileEditorView.swift in Sources */,
+				20000F000000000000000000 /* QRCodeCardView.swift in Sources */,
+				200010000000000000000000 /* RootView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		300005000000000000000000 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				200013000000000000000000 /* MediCodeWidget.swift in Sources */,
+				200014000000000000000000 /* MediCodeQuickAction.swift in Sources */,
+				200015000000000000000000 /* EmergencyProfile.swift in Sources */,
+				200016000000000000000000 /* Routing.swift in Sources */,
+				200017000000000000000000 /* ProfileStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		300008000000000000000000 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				200019000000000000000000 /* MediCodeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		600001000000000000000000 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 400002000000000000000000 /* MediCodeWidget */;
+			targetProxy = 500001000000000000000000 /* PBXContainerItemProxy */;
+		};
+		600002000000000000000000 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 400001000000000000000000 /* MediCode */;
+			targetProxy = 500002000000000000000000 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		710001000000000000000000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		710002000000000000000000 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		720001000000000000000000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MediCode/MediCode.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MediCode/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.medicode.app;
+				PRODUCT_BUNDLE_PACKAGE_TYPE = APPL;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		720002000000000000000000 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MediCode/MediCode.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MediCode/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.medicode.app;
+				PRODUCT_BUNDLE_PACKAGE_TYPE = APPL;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		730001000000000000000000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = MediCodeWidget/MediCodeWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MediCodeWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.medicode.app.widget;
+				PRODUCT_BUNDLE_PACKAGE_TYPE = "XPC!";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				WRAPPER_EXTENSION = appex;
+			};
+			name = Debug;
+		};
+		730002000000000000000000 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = MediCodeWidget/MediCodeWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MediCodeWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.medicode.app.widget;
+				PRODUCT_BUNDLE_PACKAGE_TYPE = "XPC!";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				WRAPPER_EXTENSION = appex;
+			};
+			name = Release;
+		};
+		740001000000000000000000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.medicode.app.tests;
+				PRODUCT_BUNDLE_PACKAGE_TYPE = BNDL;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MediCode.app/MediCode";
+			};
+			name = Debug;
+		};
+		740002000000000000000000 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.medicode.app.tests;
+				PRODUCT_BUNDLE_PACKAGE_TYPE = BNDL;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MediCode.app/MediCode";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		700001000000000000000000 /* Build configuration list for PBXProject "MediCode" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				710001000000000000000000 /* Debug */,
+				710002000000000000000000 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		700002000000000000000000 /* Build configuration list for PBXNativeTarget "MediCode" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				720001000000000000000000 /* Debug */,
+				720002000000000000000000 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		700003000000000000000000 /* Build configuration list for PBXNativeTarget "MediCodeWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				730001000000000000000000 /* Debug */,
+				730002000000000000000000 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		700004000000000000000000 /* Build configuration list for PBXNativeTarget "MediCodeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				740001000000000000000000 /* Debug */,
+				740002000000000000000000 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 000001000000000000000000 /* Project object */;
+}
