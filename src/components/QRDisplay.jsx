@@ -69,7 +69,7 @@ export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onL
           {/* Wallpaper section */}
           <div>
             <p className="text-sm text-gray-500 text-center mb-4">{labels.lockScreenHint}</p>
-            <WallpaperCard form={form} qrValue={url} />
+            <WallpaperCard form={form} qrValue={url} lang={lang} />
           </div>
 
           <button onClick={onBack} className="w-full text-sm text-gray-400 hover:text-red-600 transition-colors py-1">
