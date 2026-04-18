@@ -15,7 +15,7 @@ export async function fetchLanguages() {
     try {
       const dn = new Intl.DisplayNames([l.language], { type: 'language' })
       const native = dn.of(l.language)
-      if (native) label = native
+      if (native && native.toLowerCase() !== l.language.toLowerCase()) label = native
     } catch {}
     return { code: l.language, label }
   })
