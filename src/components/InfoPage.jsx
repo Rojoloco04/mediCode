@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { translateFields, fetchLanguages } from '../lib/translate'
+import { translateFields, fetchLanguages, getLocationLanguage } from '../lib/translate'
 import { generateAlertAudio } from '../lib/elevenlabs'
 
 const TRANSLATABLE = ['allergies', 'conditions', 'medications']
@@ -33,7 +33,7 @@ const ALERT_TEXT_EN = 'This person has been involved in a medical emergency.'
 
 const DEMO_RESPONDER_IDS = new Set(['FR-001', 'FR-002', 'FR-999'])
 
-function LanguageGate({ lang, setLang, languages, labels, onContinue }) {
+function LanguageGate({ lang, setLang, languages, labels, onContinue, geoAutoDetected }) {
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
       <div className="bg-gray-800 rounded-2xl p-8 w-full max-w-xs shadow-xl space-y-5">
@@ -51,6 +51,11 @@ function LanguageGate({ lang, setLang, languages, labels, onContinue }) {
             <option key={l.code} value={l.code}>{l.label}</option>
           ))}
         </select>
+        {geoAutoDetected && (
+          <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
+            <span>📍</span> Language automatically selected based on your location
+          </p>
+        )}
         <button
           onClick={onContinue}
           className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl text-sm transition-colors"
@@ -115,6 +120,7 @@ export default function InfoPage() {
     if (typeof navigator === 'undefined') return 'en'
     return navigator.language?.split('-')[0]?.toLowerCase() || 'en'
   })
+  const [geoAutoDetected, setGeoAutoDetected] = useState(false)
   const [languages, setLanguages] = useState([{ code: 'en', label: 'English' }])
   const [raw, setRaw] = useState(null)
   const [displayed, setDisplayed] = useState(null)
@@ -131,6 +137,13 @@ export default function InfoPage() {
     fetchLanguages()
       .then((langs) => setLanguages([{ code: 'en', label: 'English' }, ...langs.filter((l) => l.code !== 'en')]))
       .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.language) return
+    getLocationLanguage().then((detected) => {
+      if (detected) { setLang(detected); setGeoAutoDetected(true) }
+    })
   }, [])
 
   useEffect(() => {
@@ -221,6 +234,7 @@ export default function InfoPage() {
         languages={languages}
         labels={labels}
         onContinue={() => setStep('auth')}
+        geoAutoDetected={geoAutoDetected}
       />
     )
   }

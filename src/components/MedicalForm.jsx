@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import QRDisplay from './QRDisplay'
 import { supabase } from '../lib/supabase'
-import { fetchLanguages, useTranslatedLabels } from '../lib/translate'
+import { fetchLanguages, useTranslatedLabels, getLocationLanguage } from '../lib/translate'
 
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 
@@ -65,6 +65,7 @@ export default function MedicalForm() {
     if (typeof navigator === 'undefined') return 'en'
     return navigator.language?.split('-')[0]?.toLowerCase() || 'en'
   })
+  const [geoAutoDetected, setGeoAutoDetected] = useState(false)
   const [languages, setLanguages] = useState([{ code: 'en', label: 'English' }])
   const labels = useTranslatedLabels(FORM_LABELS, lang)
 
@@ -72,6 +73,13 @@ export default function MedicalForm() {
     fetchLanguages()
       .then((langs) => setLanguages([{ code: 'en', label: 'English' }, ...langs.filter((l) => l.code !== 'en')]))
       .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.language) return
+    getLocationLanguage().then((detected) => {
+      if (detected) { setLang(detected); setGeoAutoDetected(true) }
+    })
   }, [])
 
   function handleChange(e) {
@@ -159,6 +167,7 @@ export default function MedicalForm() {
         resolvedUuid = data.id
       }
 
+      setExistingUuid(resolvedUuid)
       setUuid(resolvedUuid)
     }
     setSaving(false)
@@ -182,6 +191,11 @@ export default function MedicalForm() {
               <option key={l.code} value={l.code}>{l.label}</option>
             ))}
           </select>
+          {geoAutoDetected && (
+            <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
+              <span>📍</span> Language automatically selected based on your location
+            </p>
+          )}
           <button
             onClick={() => setStep('form')}
             className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl text-sm transition-colors"
@@ -201,7 +215,7 @@ export default function MedicalForm() {
         lang={lang}
         languages={languages}
         onLangChange={setLang}
-        onBack={() => { setUuid(null); setExistingUuid(null) }}
+        onBack={() => setUuid(null)}
       />
     )
   }

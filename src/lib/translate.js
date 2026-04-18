@@ -1,5 +1,62 @@
 import { useEffect, useState } from 'react'
 
+const COUNTRY_LANG = {
+  us: 'en', gb: 'en', au: 'en', ca: 'en', nz: 'en', ie: 'en', za: 'en',
+  fr: 'fr', be: 'fr',
+  de: 'de', at: 'de', ch: 'de',
+  es: 'es', mx: 'es', ar: 'es', co: 'es', pe: 'es', cl: 'es', ve: 'es',
+  pt: 'pt', br: 'pt',
+  it: 'it',
+  nl: 'nl',
+  pl: 'pl',
+  ru: 'ru', by: 'ru', kz: 'ru',
+  jp: 'ja',
+  cn: 'zh', tw: 'zh', hk: 'zh',
+  kr: 'ko',
+  sa: 'ar', ae: 'ar', eg: 'ar', iq: 'ar', sy: 'ar', jo: 'ar', ma: 'ar',
+  in: 'hi',
+  tr: 'tr',
+  se: 'sv',
+  no: 'no',
+  dk: 'da',
+  fi: 'fi',
+  gr: 'el',
+  th: 'th',
+  id: 'id',
+  vn: 'vi',
+  ua: 'uk',
+  ro: 'ro',
+  hu: 'hu',
+  cz: 'cs',
+  sk: 'sk',
+  bg: 'bg',
+  hr: 'hr',
+  il: 'he',
+}
+
+export function getLocationLanguage() {
+  return new Promise((resolve) => {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) { resolve(null); return }
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&format=json`,
+            { headers: { 'Accept-Language': 'en' } }
+          )
+          const json = await res.json()
+          const cc = json.address?.country_code?.toLowerCase()
+          resolve(COUNTRY_LANG[cc] || null)
+        } catch {
+          resolve(null)
+        }
+      },
+      () => resolve(null),
+      { timeout: 5000 }
+    )
+  })
+}
+
 function validateTranslation(translated) {
   if (!translated || typeof translated !== 'string') return false
   if (translated.trim() === '') return false
