@@ -1,7 +1,8 @@
+import { useEffect, useState } from 'react'
+
 function validateTranslation(translated) {
   if (!translated || typeof translated !== 'string') return false
   if (translated.trim() === '') return false
-  if (translated.startsWith('{') && translated.includes('error')) return false
   return true
 }
 
@@ -42,4 +43,13 @@ export async function translateFields(fields, targetLang) {
   }
   const translated = entries.map(([key], i) => [key, validateTranslation(json.translations[i]) ? json.translations[i] : fields[key]])
   return { ...fields, ...Object.fromEntries(translated) }
+}
+
+export function useTranslatedLabels(defaults, lang) {
+  const [labels, setLabels] = useState(defaults)
+  useEffect(() => {
+    if (lang === 'en') { setLabels(defaults); return }
+    translateFields(defaults, lang).then(setLabels)
+  }, [lang])
+  return labels
 }

@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { text, voiceId } = req.body
+  const { text } = req.body
   if (!text || typeof text !== 'string') {
     return res.status(400).json({ error: 'Missing text to speak' })
   }
@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Missing ElevenLabs API key' })
   }
 
-  const voice = voiceId || process.env.ELEVENLABS_VOICE_ID || 'alloy'
+  const voice = process.env.ELEVENLABS_VOICE_ID || 'alloy'
 
   const response = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voice)}`,

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import QRDisplay from './QRDisplay'
 import { supabase } from '../lib/supabase'
-import { fetchLanguages, translateFields } from '../lib/translate'
+import { fetchLanguages, useTranslatedLabels } from '../lib/translate'
 
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 
@@ -59,20 +59,13 @@ export default function MedicalForm() {
 
   const [lang, setLang] = useState('en')
   const [languages, setLanguages] = useState([{ code: 'en', label: 'English' }])
-  const [labels, setLabels] = useState(FORM_LABELS)
+  const labels = useTranslatedLabels(FORM_LABELS, lang)
 
   useEffect(() => {
     fetchLanguages()
       .then((langs) => setLanguages([{ code: 'en', label: 'English' }, ...langs.filter((l) => l.code !== 'en')]))
       .catch(() => {})
   }, [])
-
-  useEffect(() => {
-    if (lang === 'en') { setLabels(FORM_LABELS); return }
-    translateFields(FORM_LABELS, lang)
-      .then(setLabels)
-      .catch(() => {})
-  }, [lang])
 
   function handleChange(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
@@ -180,7 +173,6 @@ export default function MedicalForm() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg overflow-hidden">
-        {/* Header */}
         <div className="bg-red-600 px-8 py-6">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
@@ -201,7 +193,6 @@ export default function MedicalForm() {
         </div>
 
         <div className="px-8 py-6 space-y-6">
-          {/* Find existing profile */}
           {!existingUuid && (
             <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 space-y-2">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">{labels.alreadyHaveProfile}</p>
@@ -244,7 +235,6 @@ export default function MedicalForm() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Critical section */}
             <section className="space-y-3">
               <h2 className="text-xs font-semibold text-red-600 uppercase tracking-widest">
                 {labels.criticalInfo}
@@ -274,7 +264,6 @@ export default function MedicalForm() {
               />
             </section>
 
-            {/* Additional section */}
             <section className="space-y-3">
               <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
                 {labels.additionalDetails}

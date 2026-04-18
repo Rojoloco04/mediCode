@@ -5,7 +5,6 @@ export default async function handler(req, res) {
   if (!Array.isArray(texts) || !texts.length || !target) {
     return res.status(400).json({ error: 'Missing texts or target' })
   }
-  console.log(`[translate] target=${target} count=${texts.length}`)
 
   const apiRes = await fetch(
     `https://translation.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANSLATE_KEY}`,
@@ -23,6 +22,5 @@ export default async function handler(req, res) {
 
   if (!Array.isArray(translations)) return res.status(502).json({ error: 'Invalid translation response' })
 
-  console.log(`[translate] success target=${target}`)
   res.status(200).json({ translations: translations.map((t) => t.translatedText) })
 }

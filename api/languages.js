@@ -12,6 +12,5 @@ export default async function handler(req, res) {
 
   if (!Array.isArray(languages)) return res.status(502).json({ error: 'Invalid languages response' })
 
-  console.log(`[languages] returned ${languages.length} languages`)
   res.status(200).json({ languages })
 }

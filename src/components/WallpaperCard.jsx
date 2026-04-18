@@ -1,7 +1,7 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import html2canvas from 'html2canvas'
-import { translateFields } from '../lib/translate'
+import { useTranslatedLabels } from '../lib/translate'
 
 // Preview dimensions — exported at 6x = 1080x2340 (full phone resolution)
 const W = 180
@@ -23,14 +23,7 @@ const WALLPAPER_LABELS = {
 export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
   const cardRef = useRef(null)
   const [exporting, setExporting] = useState(false)
-  const [labels, setLabels] = useState(WALLPAPER_LABELS)
-
-  useEffect(() => {
-    if (lang === 'en') { setLabels(WALLPAPER_LABELS); return }
-    translateFields(WALLPAPER_LABELS, lang)
-      .then(setLabels)
-      .catch(() => {})
-  }, [lang])
+  const labels = useTranslatedLabels(WALLPAPER_LABELS, lang)
 
   async function handleDownload() {
     setExporting(true)
@@ -67,7 +60,6 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', height: '100%', padding: 16 }}>
-          {/* Top: identity + critical info */}
           <div style={{ textAlign: 'center', marginTop: 12, width: '100%' }}>
             <p style={{ fontSize: 7, fontWeight: 700, color: '#f87171', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6 }}>
               ⚕ {labels.medicalInfo}
@@ -101,7 +93,6 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
             )}
           </div>
 
-          {/* Bottom: QR + CTA */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginBottom: 12 }}>
             {form.emergencyContact && (
               <div style={{ textAlign: 'center' }}>

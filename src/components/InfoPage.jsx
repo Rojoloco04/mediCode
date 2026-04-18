@@ -183,7 +183,6 @@ export default function InfoPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top bar */}
       <div className="bg-red-600 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-2">
           <span className="text-white text-lg">⚕</span>
@@ -205,7 +204,6 @@ export default function InfoPage() {
       </div>
 
       <div className="max-w-sm mx-auto px-4 py-5 space-y-4">
-        {/* Name + blood type hero */}
         <div className="bg-white rounded-2xl shadow-sm px-5 py-4 flex items-center justify-between">
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">{labels.patient}</p>
@@ -260,7 +258,6 @@ export default function InfoPage() {
           )}
         </div>
 
-        {/* Allergies — most critical, always prominent */}
         {displayed.allergies && (
           <div className="bg-red-50 border-2 border-red-400 rounded-2xl px-5 py-4">
             <p className="text-xs font-bold text-red-500 uppercase tracking-widest mb-1">⚠ {labels.allergies}</p>
@@ -272,17 +269,14 @@ export default function InfoPage() {
           <p className="text-xs text-center text-gray-400 animate-pulse">Translating…</p>
         )}
 
-        {/* Conditions */}
         {displayed.conditions && (
           <InfoCard label={labels.conditions} value={displayed.conditions} />
         )}
 
-        {/* Medications */}
         {displayed.medications && (
           <InfoCard label={labels.medications} value={displayed.medications} />
         )}
 
-        {/* Emergency contact */}
         {(displayed.emergencyContact || displayed.emergencyPhone) && (
           <div className="bg-white rounded-2xl shadow-sm px-5 py-4">
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{labels.emergencyContact}</p>

@@ -1,4 +1,4 @@
-export async function generateAlertAudio(text, voiceId) {
+export async function generateAlertAudio(text) {
   if (!text) {
     throw new Error('Alert text is required')
   }
@@ -6,7 +6,7 @@ export async function generateAlertAudio(text, voiceId) {
   const res = await fetch('/api/elevenlabs', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, voiceId }),
+    body: JSON.stringify({ text }),
   })
 
   if (!res.ok) {
