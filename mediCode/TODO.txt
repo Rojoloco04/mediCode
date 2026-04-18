@@ -1,0 +1,1 @@
+okay so if i try and open the QR code on my phone it of course redirects to localhost. we need some way for it to be public
