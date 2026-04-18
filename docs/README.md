@@ -1,63 +1,52 @@
 # mediCode
 
-Your medical profile, scannable in any language.
+A medical profile app that generates a scannable QR code containing your critical health information — readable by first responders in any language.
 
-If you collapse abroad, a first responder scans your lock screen. They instantly see your allergies and conditions in their language.
+## What it does
 
-## Features
+1. Fill out a form with your name, blood type, allergies, conditions, medications, and emergency contact.
+2. Get a unique QR code (and shareable link) tied to your profile.
+3. Anyone who scans the QR code can view your medical info, auto-translated into their local language via AI.
+4. Return to the site with your email to update your profile anytime.
 
-- **Medical profile form** — name, blood type, allergies, conditions, medications, emergency contact
-- **QR code generation** — links to a public info page hosted at `/{uuid}`
-- **Lock screen wallpaper** — downloadable 1080×2340px PNG with your critical info and QR code embedded
-- **Translation** — info page auto-translates to 8 languages (English, Spanish, French, Japanese, German, Chinese, Arabic, Portuguese)
-- **Profile persistence** — save your email to retrieve and update your profile from any device
-- **First responder auth** — demo ID gate on the info page (IDs: `FR-001`, `FR-002`, `FR-999`)
+## Tech stack
 
-## Tech Stack
+- **React + Vite** — frontend
+- **Tailwind CSS** — styling
+- **Supabase** — database (profiles stored by UUID)
+- **Vercel** — hosting + serverless API routes
+- **ElevenLabs / translation API** — language detection and label translation
 
-- **Frontend:** React 18 + Vite + Tailwind CSS
-- **Database:** Supabase (PostgreSQL)
-- **QR:** qrcode.react
-- **Image export:** html2canvas
-- **Translation:** MyMemory API (free, no key required)
-- **Deployment:** Vercel
-
-## Supabase Schema
-
-```sql
-create table profiles (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  email text,
-  blood_type text,
-  allergies text,
-  conditions text,
-  medications text,
-  emergency_contact text,
-  emergency_phone text,
-  created_at timestamptz default now()
-);
-```
-
-## Local Development
+## Getting started
 
 ```bash
 npm install
 npm run dev
 ```
 
-Create a `.env.local` file:
+Create a `.env.local` with your Supabase and API keys (see `.env.local` in the project root for the required variables).
+
+## Routes
+
+| Path | Description |
+|------|-------------|
+| `/` | Create or update a medical profile |
+| `/:uuid` | View a profile (shareable, used by QR code) |
+
+## Project structure
 
 ```
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+src/
+  components/
+    MedicalForm.jsx   # Profile creation/editing form with language picker
+    InfoPage.jsx      # Public-facing profile view (QR scan destination)
+    QRDisplay.jsx     # QR code + wallpaper card generation
+    WallpaperCard.jsx # Downloadable lockscreen card
+  lib/
+    supabase.js       # Supabase client
+    translate.js      # Language detection + label translation
+api/
+  elevenlabs.js       # Serverless proxy for ElevenLabs
+  translate.js        # Serverless proxy for translation
+  languages.js        # Language list endpoint
 ```
-
-## User Flow
-
-1. Fill out the medical form at `/`
-2. Submit → profile saved to Supabase, UUID generated
-3. Download the lock screen wallpaper (set it as your phone background)
-4. QR code on the wallpaper links to `/{uuid}`
-5. First responder scans → enters responder ID → sees your info in their language
-6. To update your profile later: enter your email on the home page to retrieve it
