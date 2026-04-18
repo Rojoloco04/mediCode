@@ -152,6 +152,10 @@ export default function InfoPage() {
     window.location.href = `tel:${displayed.emergencyPhone}`
   }
 
+  useEffect(() => {
+    if (authorized && alertText) handleGenerateAlert()
+  }, [authorized])
+
   if (!authorized) return <AuthGate onAuthorized={() => setAuthorized(true)} />
 
   if (loading) {
