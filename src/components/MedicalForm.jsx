@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import QRDisplay from './QRDisplay'
 import { supabase } from '../lib/supabase'
+import { fetchLanguages, translateFields } from '../lib/translate'
 
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 
@@ -15,6 +16,29 @@ const EMPTY_FORM = {
   emergencyPhone: '',
 }
 
+const FORM_LABELS = {
+  subtitle: 'Your medical profile, scannable in any language.',
+  alreadyHaveProfile: 'Already have a profile?',
+  find: 'Find',
+  noProfileFound: 'No profile found for that email.',
+  editingExisting: 'Editing existing profile',
+  createNewInstead: 'Create new instead',
+  criticalInfo: 'Critical Information',
+  fullName: 'Full Name',
+  email: 'Email',
+  bloodType: 'Blood Type',
+  bloodUnknown: 'Unknown',
+  allergies: 'Allergies',
+  additionalDetails: 'Additional Details',
+  conditions: 'Medical Conditions',
+  medications: 'Current Medications',
+  emergencyContact: 'Emergency Contact',
+  emergencyPhone: 'Their Phone',
+  saving: 'Saving…',
+  update: 'Update My QR Code →',
+  generate: 'Generate My QR Code →',
+}
+
 export default function MedicalForm() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [existingUuid, setExistingUuid] = useState(null)
@@ -24,6 +48,23 @@ export default function MedicalForm() {
   const [lookupEmail, setLookupEmail] = useState('')
   const [looking, setLooking] = useState(false)
   const [lookupError, setLookupError] = useState(null)
+
+  const [lang, setLang] = useState('en')
+  const [languages, setLanguages] = useState([{ code: 'en', label: 'English' }])
+  const [labels, setLabels] = useState(FORM_LABELS)
+
+  useEffect(() => {
+    fetchLanguages()
+      .then((langs) => setLanguages([{ code: 'en', label: 'English' }, ...langs.filter((l) => l.code !== 'en')]))
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (lang === 'en') { setLabels(FORM_LABELS); return }
+    translateFields(FORM_LABELS, lang)
+      .then(setLabels)
+      .catch(() => {})
+  }, [lang])
 
   function handleChange(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
@@ -39,7 +80,7 @@ export default function MedicalForm() {
       .eq('email', lookupEmail.trim().toLowerCase())
       .single()
     if (error || !data) {
-      setLookupError('No profile found for that email.')
+      setLookupError(labels.noProfileFound)
       setLooking(false)
       return
     }
@@ -92,7 +133,16 @@ export default function MedicalForm() {
   }
 
   if (uuid) {
-    return <QRDisplay uuid={uuid} form={form} onBack={() => { setUuid(null); setExistingUuid(null) }} />
+    return (
+      <QRDisplay
+        uuid={uuid}
+        form={form}
+        lang={lang}
+        languages={languages}
+        onLangChange={setLang}
+        onBack={() => { setUuid(null); setExistingUuid(null) }}
+      />
+    )
   }
 
   return (
@@ -100,20 +150,29 @@ export default function MedicalForm() {
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg overflow-hidden">
         {/* Header */}
         <div className="bg-red-600 px-8 py-6">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-white text-2xl">⚕</span>
-            <h1 className="text-2xl font-bold text-white">mediCode</h1>
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <span className="text-white text-2xl">⚕</span>
+              <h1 className="text-2xl font-bold text-white">mediCode</h1>
+            </div>
+            <select
+              value={lang}
+              onChange={(e) => setLang(e.target.value)}
+              className="text-sm bg-red-700 text-white border border-red-500 rounded-lg px-2 py-1 focus:outline-none"
+            >
+              {languages.map((l) => (
+                <option key={l.code} value={l.code}>{l.label}</option>
+              ))}
+            </select>
           </div>
-          <p className="text-red-100 text-sm">
-            Your medical profile, scannable in any language.
-          </p>
+          <p className="text-red-100 text-sm">{labels.subtitle}</p>
         </div>
 
         <div className="px-8 py-6 space-y-6">
           {/* Find existing profile */}
           {!existingUuid && (
             <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 space-y-2">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Already have a profile?</p>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">{labels.alreadyHaveProfile}</p>
               <form onSubmit={handleLookup} className="flex gap-2">
                 <input
                   type="email"
@@ -127,7 +186,7 @@ export default function MedicalForm() {
                   disabled={looking || !lookupEmail.trim()}
                   className="bg-gray-800 hover:bg-gray-900 disabled:opacity-40 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
                 >
-                  {looking ? '…' : 'Find'}
+                  {looking ? '…' : labels.find}
                 </button>
               </form>
               {lookupError && <p className="text-red-500 text-xs">{lookupError}</p>}
@@ -136,12 +195,12 @@ export default function MedicalForm() {
 
           {existingUuid && (
             <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-3 flex items-center justify-between">
-              <span>Editing existing profile</span>
+              <span>{labels.editingExisting}</span>
               <button
                 onClick={() => { setExistingUuid(null); setForm(EMPTY_FORM) }}
                 className="text-green-600 hover:text-green-800 text-xs underline"
               >
-                Create new instead
+                {labels.createNewInstead}
               </button>
             </div>
           )}
@@ -156,26 +215,26 @@ export default function MedicalForm() {
             {/* Critical section */}
             <section className="space-y-3">
               <h2 className="text-xs font-semibold text-red-600 uppercase tracking-widest">
-                Critical Information
+                {labels.criticalInfo}
               </h2>
-              <Field label="Full Name" name="name" value={form.name} onChange={handleChange} required placeholder="As it appears on your ID" />
-              <Field label="Email" name="email" value={form.email} onChange={handleChange} placeholder="Used to retrieve your profile later" type="email" />
+              <Field label={labels.fullName} name="name" value={form.name} onChange={handleChange} required placeholder="As it appears on your ID" />
+              <Field label={labels.email} name="email" value={form.email} onChange={handleChange} placeholder="Used to retrieve your profile later" type="email" />
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Blood Type</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{labels.bloodType}</label>
                 <select
                   name="bloodType"
                   value={form.bloodType}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 bg-white"
                 >
-                  <option value="">Unknown</option>
+                  <option value="">{labels.bloodUnknown}</option>
                   {BLOOD_TYPES.map((t) => (
                     <option key={t} value={t}>{t}</option>
                   ))}
                 </select>
               </div>
               <Field
-                label="Allergies"
+                label={labels.allergies}
                 name="allergies"
                 value={form.allergies}
                 onChange={handleChange}
@@ -186,13 +245,13 @@ export default function MedicalForm() {
             {/* Additional section */}
             <section className="space-y-3">
               <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
-                Additional Details
+                {labels.additionalDetails}
               </h2>
-              <Field label="Medical Conditions" name="conditions" value={form.conditions} onChange={handleChange} placeholder="e.g. Type 1 Diabetes, Asthma" />
-              <Field label="Current Medications" name="medications" value={form.medications} onChange={handleChange} placeholder="e.g. Insulin 10u, Albuterol PRN" />
+              <Field label={labels.conditions} name="conditions" value={form.conditions} onChange={handleChange} placeholder="e.g. Type 1 Diabetes, Asthma" />
+              <Field label={labels.medications} name="medications" value={form.medications} onChange={handleChange} placeholder="e.g. Insulin 10u, Albuterol PRN" />
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Emergency Contact" name="emergencyContact" value={form.emergencyContact} onChange={handleChange} placeholder="Jane Doe" />
-                <Field label="Their Phone" name="emergencyPhone" value={form.emergencyPhone} onChange={handleChange} placeholder="+1 555 000 0000" />
+                <Field label={labels.emergencyContact} name="emergencyContact" value={form.emergencyContact} onChange={handleChange} placeholder="Jane Doe" />
+                <Field label={labels.emergencyPhone} name="emergencyPhone" value={form.emergencyPhone} onChange={handleChange} placeholder="+1 555 000 0000" />
               </div>
             </section>
 
@@ -201,7 +260,7 @@ export default function MedicalForm() {
               disabled={saving || !form.name.trim()}
               className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors text-sm"
             >
-              {saving ? 'Saving…' : existingUuid ? 'Update My QR Code →' : 'Generate My QR Code →'}
+              {saving ? labels.saving : existingUuid ? labels.update : labels.generate}
             </button>
           </form>
         </div>
