@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { translateFields, fetchLanguages } from '../lib/translate'
@@ -13,11 +13,56 @@ const UI_LABELS = {
   conditions: 'Medical Conditions',
   medications: 'Current Medications',
   emergencyContact: 'Emergency Contact',
+  voiceAlertLabel: 'Emergency voice alert',
+  voiceAlertDesc: 'This message is ready for first responders and can be played in the selected language.',
+  mobileReady: 'Mobile-ready',
+  generateBtn: 'Generate emergency alert audio',
+  generatingBtn: 'Generating alert…',
+  callContactBtn: 'Call emergency contact',
+  noPhoneBtn: 'No emergency phone available',
+  languageTitle: 'Select Language',
+  languageSubtitle: 'Choose the language for this session',
+  continueBtn: 'Continue',
+  responderTitle: 'First Responder Access',
+  responderSubtitle: 'Enter your responder ID to view patient info',
+  verifyBtn: 'Verify & Access',
+  invalidId: 'Invalid responder ID. Access denied.',
 }
+
+const ALERT_TEXT_EN = 'This person has been involved in a medical emergency.'
 
 const DEMO_RESPONDER_IDS = new Set(['FR-001', 'FR-002', 'FR-999'])
 
-function AuthGate({ onAuthorized }) {
+function LanguageGate({ lang, setLang, languages, labels, onContinue }) {
+  return (
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+      <div className="bg-gray-800 rounded-2xl p-8 w-full max-w-xs shadow-xl space-y-5">
+        <div className="text-center space-y-1">
+          <p className="text-3xl">🌐</p>
+          <p className="text-white font-bold text-lg">{labels.languageTitle}</p>
+          <p className="text-gray-400 text-sm">{labels.languageSubtitle}</p>
+        </div>
+        <select
+          value={lang}
+          onChange={(e) => setLang(e.target.value)}
+          className="w-full bg-gray-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+        >
+          {languages.map((l) => (
+            <option key={l.code} value={l.code}>{l.label}</option>
+          ))}
+        </select>
+        <button
+          onClick={onContinue}
+          className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl text-sm transition-colors"
+        >
+          {labels.continueBtn}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function AuthGate({ onAuthorized, labels }) {
   const [input, setInput] = useState('')
   const [error, setError] = useState(false)
 
@@ -35,8 +80,8 @@ function AuthGate({ onAuthorized }) {
       <div className="bg-gray-800 rounded-2xl p-8 w-full max-w-xs shadow-xl space-y-5">
         <div className="text-center space-y-1">
           <p className="text-3xl">🪪</p>
-          <p className="text-white font-bold text-lg">First Responder Access</p>
-          <p className="text-gray-400 text-sm">Enter your responder ID to view patient info</p>
+          <p className="text-white font-bold text-lg">{labels.responderTitle}</p>
+          <p className="text-gray-400 text-sm">{labels.responderSubtitle}</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
@@ -48,13 +93,13 @@ function AuthGate({ onAuthorized }) {
             autoFocus
           />
           {error && (
-            <p className="text-red-400 text-xs text-center">Invalid responder ID. Access denied.</p>
+            <p className="text-red-400 text-xs text-center">{labels.invalidId}</p>
           )}
           <button
             type="submit"
             className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl text-sm transition-colors"
           >
-            Verify &amp; Access
+            {labels.verifyBtn}
           </button>
         </form>
         <p className="text-gray-600 text-xs text-center">Demo IDs: FR-001 · FR-002 · FR-999</p>
@@ -65,22 +110,22 @@ function AuthGate({ onAuthorized }) {
 
 export default function InfoPage() {
   const { uuid } = useParams()
-  const [authorized, setAuthorized] = useState(false)
-  const [raw, setRaw] = useState(null)
-  const [displayed, setDisplayed] = useState(null)
+  const [step, setStep] = useState('language') // 'language' | 'auth' | 'main'
   const [lang, setLang] = useState(() => {
     if (typeof navigator === 'undefined') return 'en'
-    const native = navigator.language?.split('-')[0]?.toLowerCase()
-    return native || 'en'
+    return navigator.language?.split('-')[0]?.toLowerCase() || 'en'
   })
   const [languages, setLanguages] = useState([{ code: 'en', label: 'English' }])
+  const [raw, setRaw] = useState(null)
+  const [displayed, setDisplayed] = useState(null)
   const [labels, setLabels] = useState(UI_LABELS)
   const [translating, setTranslating] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [alertText, setAlertText] = useState('This person has been involved in a medical emergency.')
+  const [alertText, setAlertText] = useState(ALERT_TEXT_EN)
   const [alertAudioUrl, setAlertAudioUrl] = useState(null)
   const [audioLoading, setAudioLoading] = useState(false)
   const [audioError, setAudioError] = useState(null)
+  const audioRef = useRef(null)
 
   useEffect(() => {
     fetchLanguages()
@@ -115,17 +160,24 @@ export default function InfoPage() {
 
   useEffect(() => {
     if (!raw) return
-    if (lang === 'en') { setDisplayed(raw); setLabels(UI_LABELS); return }
+    if (lang === 'en') {
+      setDisplayed(raw)
+      setLabels(UI_LABELS)
+      setAlertText(ALERT_TEXT_EN)
+      return
+    }
     setTranslating(true)
     const toTranslate = Object.fromEntries(
       TRANSLATABLE.filter((k) => raw[k]).map((k) => [k, raw[k]])
     )
     Promise.all([
-      translateFields(toTranslate, lang),
+      translateFields({ ...toTranslate, _alert: ALERT_TEXT_EN }, lang),
       translateFields(UI_LABELS, lang),
     ])
       .then(([translated, translatedLabels]) => {
-        setDisplayed({ ...raw, ...translated })
+        const { _alert, ...rest } = translated
+        setDisplayed({ ...raw, ...rest })
+        setAlertText(_alert || ALERT_TEXT_EN)
         setLabels(translatedLabels)
       })
       .finally(() => setTranslating(false))
@@ -136,12 +188,11 @@ export default function InfoPage() {
     setAudioError(null)
     setAudioLoading(true)
     setAlertAudioUrl(null)
-
     try {
       const audioUrl = await generateAlertAudio(alertText)
       setAlertAudioUrl(audioUrl)
-    } catch (error) {
-      setAudioError(error.message || 'Unable to generate audio alert')
+    } catch (err) {
+      setAudioError(err.message || 'Unable to generate audio alert')
     } finally {
       setAudioLoading(false)
     }
@@ -153,10 +204,30 @@ export default function InfoPage() {
   }
 
   useEffect(() => {
-    if (authorized && alertText) handleGenerateAlert()
-  }, [authorized])
+    if (step === 'main' && alertText) handleGenerateAlert()
+  }, [step])
 
-  if (!authorized) return <AuthGate onAuthorized={() => setAuthorized(true)} />
+  useEffect(() => {
+    if (alertAudioUrl && audioRef.current) {
+      audioRef.current.play().catch(() => {})
+    }
+  }, [alertAudioUrl])
+
+  if (step === 'language') {
+    return (
+      <LanguageGate
+        lang={lang}
+        setLang={setLang}
+        languages={languages}
+        labels={labels}
+        onContinue={() => setStep('auth')}
+      />
+    )
+  }
+
+  if (step === 'auth') {
+    return <AuthGate onAuthorized={() => setStep('main')} labels={labels} />
+  }
 
   if (loading) {
     return (
@@ -199,10 +270,6 @@ export default function InfoPage() {
         </select>
       </div>
 
-      <div className="max-w-sm mx-auto px-4">
-        <p className="text-xs text-white text-right opacity-90">Default language is your device locale; choose another from the menu.</p>
-      </div>
-
       <div className="max-w-sm mx-auto px-4 py-5 space-y-4">
         <div className="bg-white rounded-2xl shadow-sm px-5 py-4 flex items-center justify-between">
           <div>
@@ -223,11 +290,11 @@ export default function InfoPage() {
         <div className="bg-white rounded-2xl shadow-sm px-5 py-4 space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Emergency voice alert</p>
-              <p className="text-sm text-gray-700">This message is ready for first responders and can be generated in the device language.</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{labels.voiceAlertLabel}</p>
+              <p className="text-sm text-gray-700">{labels.voiceAlertDesc}</p>
             </div>
-            <span className="inline-flex items-center rounded-full bg-red-100 text-red-700 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em]">
-              Mobile-ready
+            <span className="inline-flex items-center rounded-full bg-red-100 text-red-700 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] shrink-0">
+              {labels.mobileReady}
             </span>
           </div>
           <textarea
@@ -242,19 +309,19 @@ export default function InfoPage() {
               disabled={audioLoading || !alertText.trim()}
               className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition-colors text-sm"
             >
-              {audioLoading ? 'Generating alert…' : 'Generate emergency alert audio'}
+              {audioLoading ? labels.generatingBtn : labels.generateBtn}
             </button>
             <button
               onClick={handleCallEmergencyContact}
               disabled={!displayed.emergencyPhone}
               className="w-full bg-gray-900 hover:bg-gray-800 disabled:opacity-40 text-white font-semibold py-3 rounded-lg transition-colors text-sm"
             >
-              {displayed.emergencyPhone ? 'Call emergency contact' : 'No emergency phone available'}
+              {displayed.emergencyPhone ? labels.callContactBtn : labels.noPhoneBtn}
             </button>
           </div>
           {audioError && <p className="text-red-500 text-sm">{audioError}</p>}
           {alertAudioUrl && (
-            <audio controls src={alertAudioUrl} className="w-full mt-3 rounded-xl" />
+            <audio ref={audioRef} controls src={alertAudioUrl} className="w-full mt-3 rounded-xl" />
           )}
         </div>
 

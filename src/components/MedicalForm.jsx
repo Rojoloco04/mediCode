@@ -17,6 +17,9 @@ const EMPTY_FORM = {
 }
 
 const FORM_LABELS = {
+  languageTitle: 'Select Language',
+  languageSubtitle: 'Choose the language for this session',
+  continueBtn: 'Continue',
   subtitle: 'Your medical profile, scannable in any language.',
   alreadyHaveProfile: 'Already have a profile?',
   find: 'Find',
@@ -48,6 +51,7 @@ const FORM_LABELS = {
 }
 
 export default function MedicalForm() {
+  const [step, setStep] = useState('language')
   const [form, setForm] = useState(EMPTY_FORM)
   const [existingUuid, setExistingUuid] = useState(null)
   const [uuid, setUuid] = useState(null)
@@ -57,7 +61,10 @@ export default function MedicalForm() {
   const [looking, setLooking] = useState(false)
   const [lookupError, setLookupError] = useState(null)
 
-  const [lang, setLang] = useState('en')
+  const [lang, setLang] = useState(() => {
+    if (typeof navigator === 'undefined') return 'en'
+    return navigator.language?.split('-')[0]?.toLowerCase() || 'en'
+  })
   const [languages, setLanguages] = useState([{ code: 'en', label: 'English' }])
   const labels = useTranslatedLabels(FORM_LABELS, lang)
 
@@ -155,6 +162,35 @@ export default function MedicalForm() {
       setUuid(resolvedUuid)
     }
     setSaving(false)
+  }
+
+  if (step === 'language') {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+        <div className="bg-gray-800 rounded-2xl p-8 w-full max-w-xs shadow-xl space-y-5">
+          <div className="text-center space-y-1">
+            <p className="text-3xl">🌐</p>
+            <p className="text-white font-bold text-lg">{labels.languageTitle}</p>
+            <p className="text-gray-400 text-sm">{labels.languageSubtitle}</p>
+          </div>
+          <select
+            value={lang}
+            onChange={(e) => setLang(e.target.value)}
+            className="w-full bg-gray-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            {languages.map((l) => (
+              <option key={l.code} value={l.code}>{l.label}</option>
+            ))}
+          </select>
+          <button
+            onClick={() => setStep('form')}
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl text-sm transition-colors"
+          >
+            {labels.continueBtn}
+          </button>
+        </div>
+      </div>
+    )
   }
 
   if (uuid) {
