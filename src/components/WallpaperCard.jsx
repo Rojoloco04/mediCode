@@ -19,7 +19,7 @@ export default function WallpaperCard({ form, qrValue }) {
         useCORS: true,
       })
       const link = document.createElement('a')
-      link.download = 'qraid-wallpaper.png'
+      link.download = 'medicode-wallpaper.png'
       link.href = canvas.toDataURL('image/png')
       link.click()
     } finally {

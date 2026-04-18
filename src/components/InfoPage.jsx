@@ -141,7 +141,7 @@ export default function InfoPage() {
       <div className="bg-red-600 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-2">
           <span className="text-white text-lg">⚕</span>
-          <span className="text-white font-bold text-base">QR-Aid</span>
+          <span className="text-white font-bold text-base">mediCode</span>
         </div>
         <select
           value={lang}

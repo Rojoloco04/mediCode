@@ -11,7 +11,7 @@ export default function QRDisplay({ uuid, form, onBack }) {
         <div className="bg-red-600 px-8 py-6">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-white text-2xl">⚕</span>
-            <h1 className="text-2xl font-bold text-white">QR-Aid</h1>
+            <h1 className="text-2xl font-bold text-white">mediCode</h1>
           </div>
           <p className="text-red-100 text-sm">Profile saved for {form.name}.</p>
         </div>
