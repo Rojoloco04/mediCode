@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 import { useParams, Link } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+import { supabase, profileFromRow } from '../lib/supabase'
 import { translateFields } from '../lib/translate'
 import { generateAlertAudio } from '../lib/elevenlabs'
 import { useLabels } from '../lib/LabelsContext'
@@ -61,6 +62,10 @@ function WaveForm({ playing, progress }) {
     </div>
   )
 }
+WaveForm.propTypes = {
+  playing: PropTypes.bool.isRequired,
+  progress: PropTypes.number.isRequired,
+}
 
 function InfoRow({ label, value }) {
   return (
@@ -80,10 +85,14 @@ function InfoRow({ label, value }) {
     </div>
   )
 }
+InfoRow.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+}
 
 export default function InfoPage() {
   const { uuid } = useParams()
-  const { labels, lang, languages } = useLabels()
+  const { labels, lang, langLabel } = useLabels()
   const [step, setStep] = useState('language')
   const [raw, setRaw] = useState(null)
   const [displayed, setDisplayed] = useState(null)
@@ -101,12 +110,7 @@ export default function InfoPage() {
     async function load() {
       const { data, error } = await supabase.from('profiles').select('*').eq('id', uuid).single()
       if (!error && data) {
-        const profile = {
-          name: data.name, bloodType: data.blood_type,
-          allergies: data.allergies, conditions: data.conditions,
-          medications: data.medications, emergencyContact: data.emergency_contact,
-          emergencyPhone: data.emergency_phone, updatedAt: data.updated_at || null,
-        }
+        const profile = profileFromRow(data)
         setRaw(profile)
         setDisplayed(profile)
       }
@@ -151,7 +155,7 @@ export default function InfoPage() {
 
   useEffect(() => {
     if (alertAudioUrl && audioRef.current) {
-      audioRef.current.play().catch(() => {})
+      audioRef.current.play().catch(() => setAlertPlaying(false))
       setAlertPlaying(true)
     }
   }, [alertAudioUrl])
@@ -162,7 +166,7 @@ export default function InfoPage() {
       audioRef.current.pause()
       setAlertPlaying(false)
     } else {
-      audioRef.current.play().catch(() => {})
+      audioRef.current.play().catch(() => setAlertPlaying(false))
       setAlertPlaying(true)
     }
   }
@@ -219,11 +223,8 @@ export default function InfoPage() {
     )
   }
 
-  const langObj = languages.find(l => l.code === lang) || { label: 'English' }
-
   return (
     <div style={{ minHeight: '100dvh', background: 'var(--paper)' }}>
-      {/* Sticky header */}
       <div style={{
         padding: '14px 20px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -237,12 +238,11 @@ export default function InfoPage() {
           <ArrowLeftIcon size={12} /> {labels.info_exit}
         </button>
         <BrandMark size={16} />
-        <LangPill code={lang} label={langObj.label} onClick={() => setStep('language')} />
+        <LangPill code={lang} label={langLabel} onClick={() => setStep('language')} />
       </div>
 
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 20px 48px', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-        {/* Patient header — dark card */}
         <div style={{ background: 'var(--ink)', color: '#fff', borderRadius: 16, padding: '18px 18px' }}>
           <div style={{
             fontSize: 10, fontFamily: 'var(--mono)', letterSpacing: '0.1em',
@@ -293,7 +293,6 @@ export default function InfoPage() {
           </div>
         </div>
 
-        {/* Allergies — coral */}
         {displayed.allergies && (
           <div style={{
             background: 'var(--accent-soft)',
@@ -313,7 +312,6 @@ export default function InfoPage() {
           </div>
         )}
 
-        {/* Voice alert */}
         <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden' }}>
           <div style={{ padding: '14px 16px 12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -321,7 +319,7 @@ export default function InfoPage() {
                 fontSize: 10, color: 'var(--ink-3)', fontFamily: 'var(--mono)',
                 letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 500,
               }}>
-                {labels.info_voiceAlert} · {langObj.label}
+                {labels.info_voiceAlert} · {langLabel}
               </div>
               <Chip tone="neutral">AI</Chip>
             </div>
@@ -383,7 +381,6 @@ export default function InfoPage() {
           )}
         </div>
 
-        {/* Emergency contact */}
         {displayed.emergencyPhone && (
           <a href={`tel:${displayed.emergencyPhone}`} style={{ textDecoration: 'none' }}>
             <div style={{

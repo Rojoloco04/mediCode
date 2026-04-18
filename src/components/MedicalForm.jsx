@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import QRDisplay from './QRDisplay'
-import { supabase } from '../lib/supabase'
+import { supabase, profileFromRow } from '../lib/supabase'
 import { useLabels } from '../lib/LabelsContext'
 import {
-  BrandMark, Chip, Btn, Field, LangPill, LanguageGate,
+  BrandMark, Chip, Btn, Field, LangPill, LanguageGate, PageShell,
   SectionHeader, BloodPicker, ArrowRightIcon, LockIcon, CheckIcon,
 } from './ui'
 
@@ -14,7 +14,7 @@ const EMPTY_FORM = {
 }
 
 export default function MedicalForm() {
-  const { labels, lang, setLang, languages } = useLabels()
+  const { labels, lang, setLang, langLabel } = useLabels()
   const [step, setStep] = useState('language')
   const [form, setForm] = useState(EMPTY_FORM)
   const [existingUuid, setExistingUuid] = useState(null)
@@ -40,11 +40,12 @@ export default function MedicalForm() {
       setLooking(false)
       return
     }
+    const profile = profileFromRow(data)
     setForm({
-      name: data.name || '', email: data.email || '',
-      bloodType: data.blood_type || '', allergies: data.allergies || '',
-      conditions: data.conditions || '', medications: data.medications || '',
-      emergencyContact: data.emergency_contact || '', emergencyPhone: data.emergency_phone || '',
+      name: profile.name || '', email: profile.email || '',
+      bloodType: profile.bloodType || '', allergies: profile.allergies || '',
+      conditions: profile.conditions || '', medications: profile.medications || '',
+      emergencyContact: profile.emergencyContact || '', emergencyPhone: profile.emergencyPhone || '',
     })
     setExistingUuid(data.id)
     setLooking(false)
@@ -98,13 +99,9 @@ export default function MedicalForm() {
     return <QRDisplay uuid={uuid} form={form} onBack={() => setUuid(null)} />
   }
 
-  const langObj = languages.find(l => l.code === lang) || { label: 'English' }
-
   return (
-    <div style={{ minHeight: '100dvh', background: 'var(--paper)' }}>
-      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+    <PageShell>
 
-        {/* Sticky header */}
         <div style={{
           padding: '16px 24px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -112,10 +109,9 @@ export default function MedicalForm() {
           position: 'sticky', top: 0, background: 'var(--paper)', zIndex: 5,
         }}>
           <BrandMark />
-          <LangPill code={lang} label={langObj.label} onClick={() => setStep('language')} />
+          <LangPill code={lang} label={langLabel} onClick={() => setStep('language')} />
         </div>
 
-        {/* Title */}
         <div style={{ padding: '24px 24px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             {!existingUuid && <Chip tone="neutral">{labels.form_draft}</Chip>}
@@ -132,7 +128,6 @@ export default function MedicalForm() {
           </p>
         </div>
 
-        {/* Lookup */}
         {!existingUuid && (
           <div style={{ padding: '0 24px 16px' }}>
             <div style={{
@@ -192,7 +187,6 @@ export default function MedicalForm() {
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} style={{ padding: '0 24px 48px' }}>
           {error && (
             <div style={{
@@ -249,7 +243,6 @@ export default function MedicalForm() {
           </p>
         </form>
 
-      </div>
-    </div>
+    </PageShell>
   )
 }

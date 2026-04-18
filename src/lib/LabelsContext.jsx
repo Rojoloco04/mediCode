@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 import { fetchLanguages, getLocationLanguage, translateFields } from './translate'
 
 export const APP_LABELS = {
@@ -109,7 +110,6 @@ export const APP_LABELS = {
   wallpaper_emergency: 'Emergency',
   wallpaper_tipHeading: 'Tip',
   wallpaper_tipBody: "Set this as your lock screen, not home screen — so it's visible without unlocking.",
-  wallpaper_layout: 'Layout',
 
   // NotFound
   notfound_title: 'Page not found',
@@ -131,11 +131,10 @@ export function LabelsProvider({ children }) {
   useEffect(() => {
     fetchLanguages()
       .then(langs => setLanguages([{ code: 'en', label: 'English' }, ...langs.filter(l => l.code !== 'en')]))
-      .catch(() => {})
   }, [])
 
   useEffect(() => {
-    if (typeof navigator !== 'undefined' && navigator.language) return
+    if (navigator.language) return
     getLocationLanguage().then(detected => {
       if (detected) { setLang(detected); setGeoAutoDetected(true) }
     })
@@ -146,11 +145,16 @@ export function LabelsProvider({ children }) {
     translateFields(APP_LABELS, lang).then(setLabels)
   }, [lang])
 
+  const langLabel = (languages.find(l => l.code === lang) || { label: 'English' }).label
+
   return (
-    <LabelsCtx.Provider value={{ labels, lang, setLang, languages, geoAutoDetected }}>
+    <LabelsCtx.Provider value={{ labels, lang, setLang, languages, langLabel, geoAutoDetected }}>
       {children}
     </LabelsCtx.Provider>
   )
+}
+LabelsProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 }
 
 export function useLabels() {

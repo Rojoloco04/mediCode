@@ -1,16 +1,17 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 import { QRCodeSVG } from 'qrcode.react'
 import WallpaperCard from './WallpaperCard'
 import { useLabels } from '../lib/LabelsContext'
 import {
   BrandMark, Chip, Btn, CheckIcon, ArrowRightIcon, ArrowLeftIcon,
-  DownloadIcon, ShareIcon, LangPill, LanguageGate,
+  DownloadIcon, ShareIcon, LangPill, LanguageGate, PageShell,
 } from './ui'
 
 export default function QRDisplay({ uuid, form, onBack }) {
-  const { labels, lang, languages } = useLabels()
+  const { labels, lang, langLabel } = useLabels()
   const [screen, setScreen] = useState('qr')
-  const langObj = languages.find(l => l.code === lang) || { label: 'English' }
+  const qrRef = useRef(null)
   const url = `${window.location.origin}/${uuid}`
   const shortUrl = `${window.location.hostname}/${uuid.slice(0, 8)}`
 
@@ -20,8 +21,7 @@ export default function QRDisplay({ uuid, form, onBack }) {
 
   if (screen === 'wallpaper') {
     return (
-      <div style={{ minHeight: '100dvh', background: 'var(--paper)' }}>
-        <div style={{ maxWidth: 480, margin: '0 auto' }}>
+      <PageShell>
           <div style={{
             padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             borderBottom: '1px solid var(--line-2)',
@@ -51,16 +51,13 @@ export default function QRDisplay({ uuid, form, onBack }) {
           <div style={{ padding: '0 24px 48px' }}>
             <WallpaperCard form={form} qrValue={url} />
           </div>
-        </div>
-      </div>
+      </PageShell>
     )
   }
 
   return (
-    <div style={{ minHeight: '100dvh', background: 'var(--paper)' }}>
-      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+    <PageShell>
 
-        {/* Header */}
         <div style={{
           padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           borderBottom: '1px solid var(--line-2)',
@@ -72,7 +69,7 @@ export default function QRDisplay({ uuid, form, onBack }) {
             <ArrowLeftIcon size={14} /> {labels.qr_edit}
           </button>
           <BrandMark />
-          <LangPill code={lang} label={langObj.label} onClick={() => setScreen('language')} />
+          <LangPill code={lang} label={langLabel} onClick={() => setScreen('language')} />
         </div>
 
         <div style={{ padding: '28px 24px 24px' }}>
@@ -90,13 +87,12 @@ export default function QRDisplay({ uuid, form, onBack }) {
           </p>
         </div>
 
-        {/* QR card */}
         <div style={{ padding: '0 24px 24px' }}>
           <div style={{
             border: '1px solid var(--line)', borderRadius: 16, background: '#fff', padding: 24,
             display: 'flex', flexDirection: 'column', alignItems: 'center',
           }}>
-            <QRCodeSVG value={url} size={180} />
+            <div ref={qrRef}><QRCodeSVG value={url} size={180} /></div>
             <div style={{
               marginTop: 16, padding: '6px 10px',
               background: 'var(--paper-2)', border: '1px solid var(--line-2)',
@@ -118,7 +114,6 @@ export default function QRDisplay({ uuid, form, onBack }) {
           </div>
         </div>
 
-        {/* Actions */}
         <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 28 }}>
           <Btn onClick={() => setScreen('wallpaper')} icon={<ArrowRightIcon size={16} />}>
             {labels.qr_wallpaperBtn}
@@ -128,7 +123,7 @@ export default function QRDisplay({ uuid, form, onBack }) {
               variant="ghost" size="sm"
               icon={<DownloadIcon size={14} />}
               onClick={() => {
-                const svg = document.querySelector('svg[data-qr]')
+                const svg = qrRef.current?.querySelector('svg')
                 if (!svg) return
                 const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' })
                 const a = document.createElement('a')
@@ -152,7 +147,6 @@ export default function QRDisplay({ uuid, form, onBack }) {
           </div>
         </div>
 
-        {/* What the QR reveals */}
         <div style={{ padding: '0 24px 48px' }}>
           <div style={{
             fontSize: 11, color: 'var(--ink-3)', fontFamily: 'var(--mono)',
@@ -182,7 +176,19 @@ export default function QRDisplay({ uuid, form, onBack }) {
           </div>
         </div>
 
-      </div>
-    </div>
+    </PageShell>
   )
+}
+
+QRDisplay.propTypes = {
+  uuid: PropTypes.string.isRequired,
+  form: PropTypes.shape({
+    name: PropTypes.string,
+    bloodType: PropTypes.string,
+    allergies: PropTypes.string,
+    conditions: PropTypes.string,
+    emergencyContact: PropTypes.string,
+    emergencyPhone: PropTypes.string,
+  }).isRequired,
+  onBack: PropTypes.func.isRequired,
 }

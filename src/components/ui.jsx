@@ -1,5 +1,5 @@
-// Shared design primitives
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 import { useLabels } from '../lib/LabelsContext'
 
 // ─── Icons ────────────────────────────────────────────────
@@ -10,6 +10,11 @@ const Ico = ({ size = 20, sw = 1.5, children }) => (
     {children}
   </svg>
 )
+Ico.propTypes = {
+  size: PropTypes.number,
+  sw: PropTypes.number,
+  children: PropTypes.node.isRequired,
+}
 
 export const GlobeIcon = ({ size = 20 }) => (
   <Ico size={size}>
@@ -17,22 +22,26 @@ export const GlobeIcon = ({ size = 20 }) => (
     <path d="M2.5 10h15M10 2.5c2.5 2.5 2.5 12.5 0 15M10 2.5c-2.5 2.5-2.5 12.5 0 15" />
   </Ico>
 )
+GlobeIcon.propTypes = { size: PropTypes.number }
 
 export const CheckIcon = ({ size = 20 }) => (
   <Ico size={size} sw={1.8}><path d="M4 10l4 4 8-8" /></Ico>
 )
+CheckIcon.propTypes = { size: PropTypes.number }
 
 export const ArrowRightIcon = ({ size = 16 }) => (
   <Ico size={size} sw={1.6}>
     <path d="M4 10h12M11 5l5 5-5 5" />
   </Ico>
 )
+ArrowRightIcon.propTypes = { size: PropTypes.number }
 
 export const ArrowLeftIcon = ({ size = 16 }) => (
   <Ico size={size} sw={1.6}>
     <path d="M16 10H4M9 5l-5 5 5 5" />
   </Ico>
 )
+ArrowLeftIcon.propTypes = { size: PropTypes.number }
 
 export const LockIcon = ({ size = 10 }) => (
   <Ico size={size}>
@@ -40,16 +49,14 @@ export const LockIcon = ({ size = 10 }) => (
     <path d="M7 9V6a3 3 0 016 0v3" />
   </Ico>
 )
-
-export const ShieldIcon = ({ size = 10 }) => (
-  <Ico size={size}><path d="M10 2L4 4v6c0 4 2.5 7 6 8 3.5-1 6-4 6-8V4l-6-2z" /></Ico>
-)
+LockIcon.propTypes = { size: PropTypes.number }
 
 export const PhoneIcon = ({ size = 16 }) => (
   <Ico size={size}>
     <path d="M6 2h8a1 1 0 011 1v14a1 1 0 01-1 1H6a1 1 0 01-1-1V3a1 1 0 011-1zM9 16h2" />
   </Ico>
 )
+PhoneIcon.propTypes = { size: PropTypes.number }
 
 export const AlertIcon = ({ size = 11 }) => (
   <Ico size={size}>
@@ -58,12 +65,14 @@ export const AlertIcon = ({ size = 11 }) => (
     <circle cx="10" cy="14.5" r="0.5" fill="currentColor" stroke="none" />
   </Ico>
 )
+AlertIcon.propTypes = { size: PropTypes.number }
 
 export const DownloadIcon = ({ size = 14 }) => (
   <Ico size={size} sw={1.6}>
     <path d="M10 3v9M6 8l4 4 4-4M4 17h12" />
   </Ico>
 )
+DownloadIcon.propTypes = { size: PropTypes.number }
 
 export const ShareIcon = ({ size = 14 }) => (
   <Ico size={size} sw={1.6}>
@@ -71,12 +80,14 @@ export const ShareIcon = ({ size = 14 }) => (
     <path d="M15 3l-5 5M15 3h-4M15 3v4" />
   </Ico>
 )
+ShareIcon.propTypes = { size: PropTypes.number }
 
 export const PlayIcon = ({ size = 16 }) => (
   <svg width={size} height={size} viewBox="0 0 20 20" fill="currentColor" style={{ display: 'block' }}>
     <path d="M6 4l10 6-10 6V4z" />
   </svg>
 )
+PlayIcon.propTypes = { size: PropTypes.number }
 
 export const PauseIcon = ({ size = 16 }) => (
   <svg width={size} height={size} viewBox="0 0 20 20" fill="currentColor" style={{ display: 'block' }}>
@@ -84,18 +95,17 @@ export const PauseIcon = ({ size = 16 }) => (
     <rect x="11.5" y="4" width="3.5" height="12" rx="0.5" />
   </svg>
 )
+PauseIcon.propTypes = { size: PropTypes.number }
 
-export const CrossIcon = ({ size = 20, color = 'currentColor' }) => (
-  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" style={{ display: 'block', flexShrink: 0 }}>
-    <path d="M8 2h4v6h6v4h-6v6H8v-6H2V8h6V2z" fill={color} />
-  </svg>
-)
-
-export const DotIcon = ({ size = 6, color = 'currentColor' }) => (
+const DotIcon = ({ size = 6, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 6 6" style={{ display: 'inline-block', flexShrink: 0 }}>
     <circle cx="3" cy="3" r="3" fill={color} />
   </svg>
 )
+DotIcon.propTypes = {
+  size: PropTypes.number,
+  color: PropTypes.string,
+}
 
 // ─── BrandMark ────────────────────────────────────────────
 export const BrandMark = ({ size = 20, color = 'var(--ink)' }) => (
@@ -112,6 +122,10 @@ export const BrandMark = ({ size = 20, color = 'var(--ink)' }) => (
     </span>
   </div>
 )
+BrandMark.propTypes = {
+  size: PropTypes.number,
+  color: PropTypes.string,
+}
 
 // ─── Chip ─────────────────────────────────────────────────
 export const Chip = ({ children, tone = 'neutral' }) => {
@@ -133,6 +147,10 @@ export const Chip = ({ children, tone = 'neutral' }) => {
       {children}
     </span>
   )
+}
+Chip.propTypes = {
+  children: PropTypes.node.isRequired,
+  tone: PropTypes.oneOf(['neutral', 'accent', 'good', 'ink']),
 }
 
 // ─── Btn ──────────────────────────────────────────────────
@@ -169,6 +187,16 @@ export const Btn = ({ children, variant = 'primary', full = true, disabled, onCl
     </button>
   )
 }
+Btn.propTypes = {
+  children: PropTypes.node,
+  variant: PropTypes.oneOf(['primary', 'accent', 'ghost', 'quiet']),
+  full: PropTypes.bool,
+  disabled: PropTypes.bool,
+  onClick: PropTypes.func,
+  icon: PropTypes.node,
+  size: PropTypes.oneOf(['md', 'sm']),
+  type: PropTypes.oneOf(['button', 'submit', 'reset']),
+}
 
 // ─── Field ────────────────────────────────────────────────
 export const Field = ({ label, name, value, onChange, placeholder, required, type = 'text', hint }) => (
@@ -196,6 +224,16 @@ export const Field = ({ label, name, value, onChange, placeholder, required, typ
     />
   </div>
 )
+Field.propTypes = {
+  label: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  value: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
+  required: PropTypes.bool,
+  type: PropTypes.string,
+  hint: PropTypes.string,
+}
 
 // ─── LangPill ─────────────────────────────────────────────
 export const LangPill = ({ code, label, onClick }) => (
@@ -216,6 +254,11 @@ export const LangPill = ({ code, label, onClick }) => (
     </span>
   </button>
 )
+LangPill.propTypes = {
+  code: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+}
 
 // ─── LanguageGate ─────────────────────────────────────────
 export function LanguageGate({ onContinue, subtitle }) {
@@ -310,6 +353,10 @@ export function LanguageGate({ onContinue, subtitle }) {
   </div>
   )
 }
+LanguageGate.propTypes = {
+  onContinue: PropTypes.func.isRequired,
+  subtitle: PropTypes.string,
+}
 
 // ─── SectionHeader ────────────────────────────────────────
 export const SectionHeader = ({ num, title, desc }) => (
@@ -330,6 +377,23 @@ export const SectionHeader = ({ num, title, desc }) => (
     )}
   </div>
 )
+SectionHeader.propTypes = {
+  num: PropTypes.number.isRequired,
+  title: PropTypes.string.isRequired,
+  desc: PropTypes.string,
+}
+
+// ─── PageShell ────────────────────────────────────────────
+export const PageShell = ({ children }) => (
+  <div style={{ minHeight: '100dvh', background: 'var(--paper)' }}>
+    <div style={{ maxWidth: 480, margin: '0 auto' }}>
+      {children}
+    </div>
+  </div>
+)
+PageShell.propTypes = {
+  children: PropTypes.node.isRequired,
+}
 
 // ─── BloodPicker ──────────────────────────────────────────
 const BLOOD = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
@@ -363,3 +427,9 @@ export const BloodPicker = ({ value, onChange, label = 'Blood type', optionalLab
     </div>
   </div>
 )
+BloodPicker.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  label: PropTypes.string,
+  optionalLabel: PropTypes.string,
+}

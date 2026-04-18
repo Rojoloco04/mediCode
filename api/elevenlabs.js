@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Missing ElevenLabs API key' })
   }
 
-  const voice = process.env.ELEVENLABS_VOICE_ID || 'alloy'
+  const voice = process.env.ELEVENLABS_VOICE_ID || '21m00Tcm4TlvDq8ikWAM'
 
   const response = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voice)}`,

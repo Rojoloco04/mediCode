@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 import { QRCodeCanvas } from 'qrcode.react'
 import html2canvas from 'html2canvas'
 import { useLabels } from '../lib/LabelsContext'
@@ -54,7 +55,6 @@ export default function WallpaperCard({ form, qrValue }) {
         {labels.wallpaper_preview}
       </p>
 
-      {/* Wallpaper preview */}
       <div
         ref={cardRef}
         style={{
@@ -85,14 +85,12 @@ export default function WallpaperCard({ form, qrValue }) {
           </div>
         </div>
 
-        {/* Medical badge */}
         <div style={{
           marginTop: 'auto',
           background: 'rgba(255,255,255,0.08)',
           border: '1px solid rgba(255,255,255,0.12)',
           borderRadius: 16, padding: 14,
         }}>
-          {/* Badge header */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
             fontSize: 9,
@@ -156,18 +154,14 @@ export default function WallpaperCard({ form, qrValue }) {
         </div>
       </div>
 
-      {/* Actions */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        <Btn variant="ghost" size="sm" disabled>{labels.wallpaper_layout}</Btn>
-        <Btn
-          size="sm"
-          icon={<DownloadIcon size={14} />}
-          onClick={handleDownload}
-          disabled={exporting}
-        >
-          {exporting ? labels.wallpaper_exporting : labels.wallpaper_download}
-        </Btn>
-      </div>
+      <Btn
+        size="sm"
+        icon={<DownloadIcon size={14} />}
+        onClick={handleDownload}
+        disabled={exporting}
+      >
+        {exporting ? labels.wallpaper_exporting : labels.wallpaper_download}
+      </Btn>
 
       <div style={{
         background: 'var(--paper-2)', border: '1px solid var(--line-2)',
@@ -185,4 +179,17 @@ export default function WallpaperCard({ form, qrValue }) {
       </div>
     </div>
   )
+}
+
+WallpaperCard.propTypes = {
+  form: PropTypes.shape({
+    name: PropTypes.string,
+    bloodType: PropTypes.string,
+    allergies: PropTypes.string,
+    conditions: PropTypes.string,
+    medications: PropTypes.string,
+    emergencyContact: PropTypes.string,
+    emergencyPhone: PropTypes.string,
+  }).isRequired,
+  qrValue: PropTypes.string.isRequired,
 }

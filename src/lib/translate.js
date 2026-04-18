@@ -88,15 +88,9 @@ export async function translateFields(fields, targetLang) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ texts: entries.map(([, v]) => v), target: targetLang }),
   })
-  if (!res.ok) {
-    console.warn(`Translation request failed (${res.status}) for lang=${targetLang}`)
-    return fields
-  }
+  if (!res.ok) return fields
   const json = await res.json()
-  if (!Array.isArray(json.translations)) {
-    console.warn('Translation output failed validation, using original')
-    return fields
-  }
+  if (!Array.isArray(json.translations)) return fields
   const translated = entries.map(([key], i) => [key, validateTranslation(json.translations[i]) ? json.translations[i] : fields[key]])
   return { ...fields, ...Object.fromEntries(translated) }
 }
