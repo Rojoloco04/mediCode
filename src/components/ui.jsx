@@ -1,4 +1,5 @@
 // Shared design primitives
+import { useTranslatedLabels } from '../lib/translate'
 
 // ─── Icons ────────────────────────────────────────────────
 const Ico = ({ size = 20, sw = 1.5, children }) => (
@@ -216,7 +217,16 @@ export const LangPill = ({ code, label, onClick }) => (
 )
 
 // ─── LanguageGate ─────────────────────────────────────────
-export const LanguageGate = ({ lang, setLang, languages, onContinue, geoAutoDetected, title, subtitle, continueLabel }) => (
+const GATE_DEFAULTS = {
+  title: 'Choose your language',
+  subtitle: 'Used for form labels and, in an emergency, the translated profile shown to responders.',
+  continueLabel: 'Continue',
+}
+
+export function LanguageGate({ lang, setLang, languages, onContinue, geoAutoDetected, subtitle }) {
+  const base = subtitle ? { ...GATE_DEFAULTS, subtitle } : GATE_DEFAULTS
+  const t = useTranslatedLabels(base, lang)
+  return (
   <div style={{
     minHeight: '100dvh', background: 'var(--paper)',
     display: 'flex', flexDirection: 'column',
@@ -226,25 +236,17 @@ export const LanguageGate = ({ lang, setLang, languages, onContinue, geoAutoDete
         <BrandMark />
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: 48 }}>
-        <div style={{
-          width: 44, height: 44, borderRadius: 12,
-          background: 'var(--paper-2)', border: '1px solid var(--line)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          marginBottom: 20,
-        }}>
-          <GlobeIcon size={20} />
-        </div>
         <h1 style={{
           fontSize: 28, fontWeight: 600, letterSpacing: '-0.025em',
           margin: '0 0 8px', lineHeight: 1.1, color: 'var(--ink)',
         }}>
-          {title || 'Choose your language'}
+          {t.title}
         </h1>
         <p style={{
           fontSize: 15, color: 'var(--ink-3)', margin: '0 0 28px',
           lineHeight: 1.45, maxWidth: 320,
         }}>
-          {subtitle || 'Used for form labels and, in an emergency, the translated profile shown to responders.'}
+          {t.subtitle}
         </p>
         <div style={{ maxHeight: 340, overflowY: 'auto', marginRight: -4, paddingRight: 4 }}>
           {languages.map(l => (
@@ -291,7 +293,8 @@ export const LanguageGate = ({ lang, setLang, languages, onContinue, geoAutoDete
       </div>
     </div>
   </div>
-)
+  )
+}
 
 // ─── SectionHeader ────────────────────────────────────────
 export const SectionHeader = ({ num, title, desc }) => (

@@ -8,9 +8,6 @@ import {
 } from './ui'
 
 const QR_LABELS = {
-  langTitle: 'Choose your language',
-  langSubtitle: 'Used for form labels and, in an emergency, the translated profile shown to responders.',
-  langContinue: 'Continue',
   edit: 'Edit',
   back: 'Back',
   saved: 'Saved',
@@ -44,9 +41,6 @@ export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onL
         lang={lang} setLang={onLangChange}
         languages={languages}
         onContinue={() => setScreen('qr')}
-        title={labels.langTitle}
-        subtitle={labels.langSubtitle}
-        continueLabel={labels.langContinue}
       />
     )
   }

@@ -13,9 +13,6 @@ const TRANSLATABLE = ['allergies', 'conditions', 'medications']
 const ALERT_TEXT_EN = 'This person has been involved in a medical emergency.'
 
 const UI_LABELS = {
-  langTitle: 'Choose your language',
-  langSubtitle: 'Select the language you want to view this profile in.',
-  langContinue: 'Continue',
   patient: 'Patient',
   bloodUnknown: 'Blood unknown',
   allergies: 'Allergies',
@@ -267,9 +264,7 @@ export default function InfoPage() {
         languages={languages}
         onContinue={() => setStep(authorized ? 'main' : 'auth')}
         geoAutoDetected={geoAutoDetected}
-        title={uiLabels.langTitle}
-        subtitle={uiLabels.langSubtitle}
-        continueLabel={uiLabels.langContinue}
+        subtitle="Select the language you want to view this profile in."
       />
     )
   }

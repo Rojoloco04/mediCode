@@ -8,9 +8,6 @@ import {
 } from './ui'
 
 const FORM_LABELS = {
-  langTitle: 'Choose your language',
-  langSubtitle: 'Used for form labels and, in an emergency, the translated profile shown to responders.',
-  langContinue: 'Continue',
   pageTitle: 'Your medical profile',
   pageDesc: 'Kept private until a QR code is scanned — then shown to responders in their language.',
   haveProfile: 'Have a profile already?',
@@ -157,9 +154,6 @@ export default function MedicalForm() {
         languages={languages}
         onContinue={() => setStep('form')}
         geoAutoDetected={geoAutoDetected}
-        title={labels.langTitle}
-        subtitle={labels.langSubtitle}
-        continueLabel={labels.langContinue}
       />
     )
   }
