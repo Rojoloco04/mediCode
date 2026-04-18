@@ -279,7 +279,7 @@ export function LanguageGate({ lang, setLang, languages, onContinue, geoAutoDete
           ))}
         </div>
         <div style={{ marginTop: 20 }}>
-          <Btn onClick={onContinue} icon={<ArrowRightIcon size={16} />}>{continueLabel || 'Continue'}</Btn>
+          <Btn onClick={onContinue} icon={<ArrowRightIcon size={16} />}>{t.continueLabel}</Btn>
         </div>
         {geoAutoDetected && (
           <p style={{
