@@ -162,8 +162,8 @@ export default function InfoPage() {
   }
 
   useEffect(() => {
-    if (step === 'main' && alertText) handleGenerateAlert()
-  }, [step])
+    if (step === 'main' && alertText && !translating) handleGenerateAlert()
+  }, [step, alertText, translating])
 
   useEffect(() => {
     if (alertAudioUrl && audioRef.current) {
