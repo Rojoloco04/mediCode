@@ -16,8 +16,57 @@ const LANGUAGES = [
 
 const TRANSLATABLE = ['allergies', 'conditions', 'medications']
 
+const DEMO_RESPONDER_IDS = new Set(['FR-001', 'FR-002', 'FR-999'])
+
+function AuthGate({ onAuthorized }) {
+  const [input, setInput] = useState('')
+  const [error, setError] = useState(false)
+
+  function handleSubmit(e) {
+    e.preventDefault()
+    if (DEMO_RESPONDER_IDS.has(input.trim().toUpperCase())) {
+      onAuthorized()
+    } else {
+      setError(true)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+      <div className="bg-gray-800 rounded-2xl p-8 w-full max-w-xs shadow-xl space-y-5">
+        <div className="text-center space-y-1">
+          <p className="text-3xl">🪪</p>
+          <p className="text-white font-bold text-lg">First Responder Access</p>
+          <p className="text-gray-400 text-sm">Enter your responder ID to view patient info</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => { setInput(e.target.value); setError(false) }}
+            placeholder="e.g. FR-001"
+            className="w-full bg-gray-700 text-white placeholder-gray-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 uppercase tracking-widest"
+            autoFocus
+          />
+          {error && (
+            <p className="text-red-400 text-xs text-center">Invalid responder ID. Access denied.</p>
+          )}
+          <button
+            type="submit"
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl text-sm transition-colors"
+          >
+            Verify &amp; Access
+          </button>
+        </form>
+        <p className="text-gray-600 text-xs text-center">Demo IDs: FR-001 · FR-002 · FR-999</p>
+      </div>
+    </div>
+  )
+}
+
 export default function InfoPage() {
   const { uuid } = useParams()
+  const [authorized, setAuthorized] = useState(false)
   const [raw, setRaw] = useState(null)
   const [displayed, setDisplayed] = useState(null)
   const [lang, setLang] = useState('en')
@@ -60,6 +109,8 @@ export default function InfoPage() {
       .then((translated) => setDisplayed({ ...raw, ...translated }))
       .finally(() => setTranslating(false))
   }, [lang, raw])
+
+  if (!authorized) return <AuthGate onAuthorized={() => setAuthorized(true)} />
 
   if (loading) {
     return (
