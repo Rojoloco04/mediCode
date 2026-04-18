@@ -14,6 +14,7 @@ const ALERT_TEXT_EN = 'This person has been involved in a medical emergency.'
 
 const UI_LABELS = {
   patient: 'Patient',
+  bloodType: 'Blood type',
   bloodUnknown: 'Blood unknown',
   allergies: 'Allergies',
   voiceAlert: 'Voice alert',
@@ -39,7 +40,7 @@ function relativeTime(iso, labels) {
 }
 
 
-function WaveForm({ playing }) {
+function WaveForm({ playing, progress }) {
   const bars = 32
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 2, height: 24 }}>
@@ -49,7 +50,7 @@ function WaveForm({ playing }) {
         return (
           <div key={i} style={{
             flex: 1, minWidth: 1.5, height: h,
-            background: playing && i < bars / 2 ? 'var(--accent)' : 'var(--ink-4)',
+            background: playing && i < progress * bars ? 'var(--accent)' : 'var(--ink-4)',
             borderRadius: 1, transition: 'background 0.3s',
           }} />
         )
@@ -95,6 +96,7 @@ export default function InfoPage() {
   const [audioLoading, setAudioLoading] = useState(false)
   const [audioError, setAudioError] = useState(null)
   const [alertPlaying, setAlertPlaying] = useState(false)
+  const [audioProgress, setAudioProgress] = useState(0)
   const audioRef = useRef(null)
   const uiLabels = useTranslatedLabels(UI_LABELS, lang)
 
@@ -361,7 +363,7 @@ export default function InfoPage() {
                 : alertPlaying ? <PauseIcon size={14} /> : <PlayIcon size={14} />}
             </button>
             <div style={{ flex: 1 }}>
-              <WaveForm playing={alertPlaying} />
+              <WaveForm playing={alertPlaying} progress={audioProgress} />
             </div>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--ink-3)' }}>0:04</div>
           </div>
