@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { translateFields, fetchLanguages } from '../lib/translate'
+import { generateAlertAudio } from '../lib/elevenlabs'
 
 const TRANSLATABLE = ['allergies', 'conditions', 'medications']
 
@@ -67,11 +68,19 @@ export default function InfoPage() {
   const [authorized, setAuthorized] = useState(false)
   const [raw, setRaw] = useState(null)
   const [displayed, setDisplayed] = useState(null)
-  const [lang, setLang] = useState('en')
+  const [lang, setLang] = useState(() => {
+    if (typeof navigator === 'undefined') return 'en'
+    const native = navigator.language?.split('-')[0]?.toLowerCase()
+    return native || 'en'
+  })
   const [languages, setLanguages] = useState([{ code: 'en', label: 'English' }])
   const [labels, setLabels] = useState(UI_LABELS)
   const [translating, setTranslating] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [alertText, setAlertText] = useState('This person has been involved in a medical emergency.')
+  const [alertAudioUrl, setAlertAudioUrl] = useState(null)
+  const [audioLoading, setAudioLoading] = useState(false)
+  const [audioError, setAudioError] = useState(null)
 
   useEffect(() => {
     fetchLanguages()
@@ -122,6 +131,27 @@ export default function InfoPage() {
       .finally(() => setTranslating(false))
   }, [lang, raw])
 
+  async function handleGenerateAlert() {
+    if (!alertText) return
+    setAudioError(null)
+    setAudioLoading(true)
+    setAlertAudioUrl(null)
+
+    try {
+      const audioUrl = await generateAlertAudio(alertText)
+      setAlertAudioUrl(audioUrl)
+    } catch (error) {
+      setAudioError(error.message || 'Unable to generate audio alert')
+    } finally {
+      setAudioLoading(false)
+    }
+  }
+
+  function handleCallEmergencyContact() {
+    if (!displayed?.emergencyPhone) return
+    window.location.href = `tel:${displayed.emergencyPhone}`
+  }
+
   if (!authorized) return <AuthGate onAuthorized={() => setAuthorized(true)} />
 
   if (loading) {
@@ -166,6 +196,10 @@ export default function InfoPage() {
         </select>
       </div>
 
+      <div className="max-w-sm mx-auto px-4">
+        <p className="text-xs text-white text-right opacity-90">Default language is your device locale; choose another from the menu.</p>
+      </div>
+
       <div className="max-w-sm mx-auto px-4 py-5 space-y-4">
         {/* Name + blood type hero */}
         <div className="bg-white rounded-2xl shadow-sm px-5 py-4 flex items-center justify-between">
@@ -181,6 +215,44 @@ export default function InfoPage() {
             <div className="bg-gray-100 text-gray-400 text-xs font-medium rounded-xl w-14 h-14 flex items-center justify-center">
               {labels.bloodUnknown}
             </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm px-5 py-4 space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Emergency voice alert</p>
+              <p className="text-sm text-gray-700">This message is ready for first responders and can be generated in the device language.</p>
+            </div>
+            <span className="inline-flex items-center rounded-full bg-red-100 text-red-700 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em]">
+              Mobile-ready
+            </span>
+          </div>
+          <textarea
+            value={alertText}
+            onChange={(e) => setAlertText(e.target.value)}
+            rows={3}
+            className="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-400"
+          />
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={handleGenerateAlert}
+              disabled={audioLoading || !alertText.trim()}
+              className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition-colors text-sm"
+            >
+              {audioLoading ? 'Generating alert…' : 'Generate emergency alert audio'}
+            </button>
+            <button
+              onClick={handleCallEmergencyContact}
+              disabled={!displayed.emergencyPhone}
+              className="w-full bg-gray-900 hover:bg-gray-800 disabled:opacity-40 text-white font-semibold py-3 rounded-lg transition-colors text-sm"
+            >
+              {displayed.emergencyPhone ? 'Call emergency contact' : 'No emergency phone available'}
+            </button>
+          </div>
+          {audioError && <p className="text-red-500 text-sm">{audioError}</p>}
+          {alertAudioUrl && (
+            <audio controls src={alertAudioUrl} className="w-full mt-3 rounded-xl" />
           )}
         </div>
 
