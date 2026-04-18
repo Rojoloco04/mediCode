@@ -3,6 +3,7 @@ export default async function handler(req, res) {
 
   const { text, target } = req.body
   if (!text || !target) return res.status(400).json({ error: 'Missing text or target' })
+  console.log(`[translate] target=${target} chars=${text.length}`)
 
   const apiRes = await fetch(
     `https://translation.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANSLATE_KEY}`,
@@ -20,5 +21,6 @@ export default async function handler(req, res) {
 
   if (!translated) return res.status(502).json({ error: 'Invalid translation response' })
 
+  console.log(`[translate] success target=${target}`)
   res.status(200).json({ translated })
 }
