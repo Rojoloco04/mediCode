@@ -1,6 +1,6 @@
 // Shared design primitives
 import { useState } from 'react'
-import { useTranslatedLabels } from '../lib/translate'
+import { useLabels } from '../lib/LabelsContext'
 
 // ─── Icons ────────────────────────────────────────────────
 const Ico = ({ size = 20, sw = 1.5, children }) => (
@@ -218,15 +218,9 @@ export const LangPill = ({ code, label, onClick }) => (
 )
 
 // ─── LanguageGate ─────────────────────────────────────────
-const GATE_DEFAULTS = {
-  title: 'Choose your language',
-  subtitle: 'Used for form labels and, in an emergency, the translated profile shown to responders.',
-  continueLabel: 'Continue',
-}
-
-export function LanguageGate({ lang, setLang, languages, onContinue, geoAutoDetected, subtitle }) {
-  const base = subtitle ? { ...GATE_DEFAULTS, subtitle } : GATE_DEFAULTS
-  const t = useTranslatedLabels(base, lang)
+export function LanguageGate({ onContinue, subtitle }) {
+  const { lang, setLang, languages, labels, geoAutoDetected } = useLabels()
+  const displaySubtitle = subtitle ?? labels.gate_subtitle
   const [search, setSearch] = useState('')
   const filtered = search.trim()
     ? languages.filter(l =>
@@ -248,19 +242,19 @@ export function LanguageGate({ lang, setLang, languages, onContinue, geoAutoDete
           fontSize: 28, fontWeight: 600, letterSpacing: '-0.025em',
           margin: '0 0 8px', lineHeight: 1.1, color: 'var(--ink)',
         }}>
-          {t.title}
+          {labels.gate_title}
         </h1>
         <p style={{
           fontSize: 15, color: 'var(--ink-3)', margin: '0 0 16px',
           lineHeight: 1.45, maxWidth: 320,
         }}>
-          {t.subtitle}
+          {displaySubtitle}
         </p>
         <input
           type="search"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Search languages…"
+          placeholder={labels.gate_searchPlaceholder}
           style={{
             width: '100%', padding: '9px 12px', marginBottom: 12,
             borderRadius: 10, border: '1px solid var(--line)',
@@ -300,7 +294,7 @@ export function LanguageGate({ lang, setLang, languages, onContinue, geoAutoDete
           ))}
         </div>
         <div style={{ marginTop: 20 }}>
-          <Btn onClick={onContinue} icon={<ArrowRightIcon size={16} />}>{t.continueLabel}</Btn>
+          <Btn onClick={onContinue} icon={<ArrowRightIcon size={16} />}>{labels.gate_continue}</Btn>
         </div>
         {geoAutoDetected && (
           <p style={{
@@ -308,7 +302,7 @@ export function LanguageGate({ lang, setLang, languages, onContinue, geoAutoDete
             display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center',
             fontFamily: 'var(--mono)', letterSpacing: '0.02em',
           }}>
-            <DotIcon color="var(--ink-4)" size={4} /> auto-detected from your location
+            <DotIcon color="var(--ink-4)" size={4} /> {labels.gate_autoDetected}
           </p>
         )}
       </div>

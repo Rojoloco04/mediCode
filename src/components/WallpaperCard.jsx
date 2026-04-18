@@ -1,43 +1,27 @@
 import { useRef, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import html2canvas from 'html2canvas'
-import { useTranslatedLabels } from '../lib/translate'
+import { useLabels } from '../lib/LabelsContext'
 import { Btn, DownloadIcon } from './ui'
 
 const W = 220
 const H = 476
 
-const WALLPAPER_LABELS = {
-  scanHint: 'Scan for full profile in your language',
-  preview: 'Lock screen wallpaper preview',
-  exporting: 'Exporting…',
-  download: 'Download PNG',
-  badgeTitle: 'Medical',
-  namePlaceholder: 'Your name',
-  blood: 'Blood',
-  allergies: 'Allergies',
-  conditions: 'Conditions',
-  medications: 'Meds',
-  emergency: 'Emergency',
-  tipHeading: 'Tip',
-  tipBody: "Set this as your lock screen, not home screen — so it's visible without unlocking.",
-}
-
 function buildOfflineQrValue(url, form, labels) {
   const lines = [url, '']
-  if (form.bloodType) lines.push(`${labels.blood}: ${form.bloodType}`)
-  if (form.allergies) lines.push(`${labels.allergies}: ${form.allergies}`)
-  if (form.conditions) lines.push(`${labels.conditions}: ${form.conditions}`)
-  if (form.medications) lines.push(`${labels.medications}: ${form.medications}`)
+  if (form.bloodType) lines.push(`${labels.wallpaper_blood}: ${form.bloodType}`)
+  if (form.allergies) lines.push(`${labels.wallpaper_allergies}: ${form.allergies}`)
+  if (form.conditions) lines.push(`${labels.wallpaper_conditions}: ${form.conditions}`)
+  if (form.medications) lines.push(`${labels.wallpaper_medications}: ${form.medications}`)
   const contact = [form.emergencyContact, form.emergencyPhone].filter(Boolean).join(' ')
-  if (contact) lines.push(`${labels.emergency}: ${contact}`)
+  if (contact) lines.push(`${labels.wallpaper_emergency}: ${contact}`)
   return lines.join('\n')
 }
 
-export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
+export default function WallpaperCard({ form, qrValue }) {
+  const { labels } = useLabels()
   const cardRef = useRef(null)
   const [exporting, setExporting] = useState(false)
-  const labels = useTranslatedLabels(WALLPAPER_LABELS, lang)
   const offlineQrValue = buildOfflineQrValue(qrValue, form, labels)
 
   const dateStr = new Date().toLocaleDateString('en-US', {
@@ -67,7 +51,7 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
         fontSize: 11, color: 'var(--ink-4)', textAlign: 'center',
         fontFamily: 'var(--mono)', letterSpacing: '0.04em', margin: 0,
       }}>
-        {labels.preview}
+        {labels.wallpaper_preview}
       </p>
 
       {/* Wallpaper preview */}
@@ -119,11 +103,11 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
             <svg width="10" height="10" viewBox="0 0 20 20" fill="none">
               <path d="M8 2h4v6h6v4h-6v6H8v-6H2V8h6V2z" fill="oklch(60% 0.175 25)" />
             </svg>
-            {labels.badgeTitle}
+            {labels.wallpaper_badgeTitle}
           </div>
 
           <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em', marginBottom: 8 }}>
-            {form.name || labels.namePlaceholder}
+            {form.name || labels.wallpaper_namePlaceholder}
           </div>
 
           <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
@@ -132,7 +116,7 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
                 fontSize: 8, opacity: 0.55, letterSpacing: '0.08em',
                 textTransform: 'uppercase', marginBottom: 2,
               }}>
-                {labels.blood}
+                {labels.wallpaper_blood}
               </div>
               <div style={{
                 fontFamily: "'JetBrains Mono', ui-monospace, monospace",
@@ -147,7 +131,7 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
                   fontSize: 8, opacity: 0.55, letterSpacing: '0.08em',
                   textTransform: 'uppercase', color: 'oklch(78% 0.13 25)', marginBottom: 2,
                 }}>
-                  {labels.allergies}
+                  {labels.wallpaper_allergies}
                 </div>
                 <div style={{ fontSize: 11, color: 'oklch(85% 0.08 25)', lineHeight: 1.3 }}>
                   {form.allergies}
@@ -166,7 +150,7 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
               <QRCodeCanvas value={offlineQrValue} size={54} />
             </div>
             <div style={{ fontSize: 9, opacity: 0.65, lineHeight: 1.4 }}>
-              {labels.scanHint}
+              {labels.wallpaper_scanHint}
             </div>
           </div>
         </div>
@@ -174,14 +158,14 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
 
       {/* Actions */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        <Btn variant="ghost" size="sm" disabled>Layout</Btn>
+        <Btn variant="ghost" size="sm" disabled>{labels.wallpaper_layout}</Btn>
         <Btn
           size="sm"
           icon={<DownloadIcon size={14} />}
           onClick={handleDownload}
           disabled={exporting}
         >
-          {exporting ? labels.exporting : labels.download}
+          {exporting ? labels.wallpaper_exporting : labels.wallpaper_download}
         </Btn>
       </div>
 
@@ -193,10 +177,10 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
           fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--ink-3)',
           letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8,
         }}>
-          {labels.tipHeading}
+          {labels.wallpaper_tipHeading}
         </div>
         <p style={{ margin: 0, fontSize: 13, color: 'var(--ink-2)', lineHeight: 1.5 }}>
-          {labels.tipBody}
+          {labels.wallpaper_tipBody}
         </p>
       </div>
     </div>

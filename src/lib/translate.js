@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 
 const COUNTRY_LANG = {
   us: 'en', gb: 'en', au: 'en', ca: 'en', nz: 'en', ie: 'en', za: 'en',
@@ -102,11 +101,3 @@ export async function translateFields(fields, targetLang) {
   return { ...fields, ...Object.fromEntries(translated) }
 }
 
-export function useTranslatedLabels(defaults, lang) {
-  const [labels, setLabels] = useState(defaults)
-  useEffect(() => {
-    if (lang === 'en') { setLabels(defaults); return }
-    translateFields(defaults, lang).then(setLabels)
-  }, [lang])
-  return labels
-}

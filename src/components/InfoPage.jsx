@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { translateFields, fetchLanguages, getLocationLanguage, useTranslatedLabels } from '../lib/translate'
+import { translateFields } from '../lib/translate'
 import { generateAlertAudio } from '../lib/elevenlabs'
+import { useLabels } from '../lib/LabelsContext'
 import {
   BrandMark, Chip, Btn, LangPill, LanguageGate,
   CheckIcon, AlertIcon, PhoneIcon,
@@ -12,33 +13,14 @@ import {
 const TRANSLATABLE = ['allergies', 'conditions', 'medications']
 const ALERT_TEXT_EN = 'This person has been involved in a medical emergency.'
 
-const UI_LABELS = {
-  patient: 'Patient',
-  bloodType: 'Blood type',
-  bloodUnknown: 'Blood unknown',
-  allergies: 'Allergies',
-  voiceAlert: 'Voice alert',
-  conditions: 'Conditions',
-  medications: 'Medications',
-  emergencyContact: 'Emergency contact',
-  profileNotFound: 'Profile not found',
-  exit: 'Exit',
-  updatedJustNow: 'Updated just now',
-  updatedMinutesAgo: 'Updated {n}m ago',
-  updatedHoursAgo: 'Updated {n}h ago',
-  updatedDaysAgo: 'Updated {n}d ago',
-}
-
 function relativeTime(iso, labels) {
   if (!iso) return null
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
-  const L = labels ?? {}
-  if (diff < 60) return L.updatedJustNow ?? 'Updated just now'
-  if (diff < 3600) return (L.updatedMinutesAgo ?? 'Updated {n}m ago').replace('{n}', Math.floor(diff / 60))
-  if (diff < 86400) return (L.updatedHoursAgo ?? 'Updated {n}h ago').replace('{n}', Math.floor(diff / 3600))
-  return (L.updatedDaysAgo ?? 'Updated {n}d ago').replace('{n}', Math.floor(diff / 86400))
+  if (diff < 60) return labels.info_updatedJustNow
+  if (diff < 3600) return labels.info_updatedMinutesAgo.replace('{n}', Math.floor(diff / 60))
+  if (diff < 86400) return labels.info_updatedHoursAgo.replace('{n}', Math.floor(diff / 3600))
+  return labels.info_updatedDaysAgo.replace('{n}', Math.floor(diff / 86400))
 }
-
 
 function WaveForm({ playing, progress }) {
   const bars = 32
@@ -80,13 +62,8 @@ function InfoRow({ label, value }) {
 
 export default function InfoPage() {
   const { uuid } = useParams()
+  const { labels, lang, languages } = useLabels()
   const [step, setStep] = useState('language')
-  const [lang, setLang] = useState(() => {
-    if (typeof navigator === 'undefined') return 'en'
-    return navigator.language?.split('-')[0]?.toLowerCase() || 'en'
-  })
-  const [geoAutoDetected, setGeoAutoDetected] = useState(false)
-  const [languages, setLanguages] = useState([{ code: 'en', label: 'English' }])
   const [raw, setRaw] = useState(null)
   const [displayed, setDisplayed] = useState(null)
   const [translating, setTranslating] = useState(false)
@@ -98,20 +75,6 @@ export default function InfoPage() {
   const [alertPlaying, setAlertPlaying] = useState(false)
   const [audioProgress, setAudioProgress] = useState(0)
   const audioRef = useRef(null)
-  const uiLabels = useTranslatedLabels(UI_LABELS, lang)
-
-  useEffect(() => {
-    fetchLanguages()
-      .then(langs => setLanguages([{ code: 'en', label: 'English' }, ...langs.filter(l => l.code !== 'en')]))
-      .catch(() => {})
-  }, [])
-
-  useEffect(() => {
-    if (typeof navigator !== 'undefined' && navigator.language) return
-    getLocationLanguage().then(detected => {
-      if (detected) { setLang(detected); setGeoAutoDetected(true) }
-    })
-  }, [])
 
   useEffect(() => {
     async function load() {
@@ -186,11 +149,8 @@ export default function InfoPage() {
   if (step === 'language') {
     return (
       <LanguageGate
-        lang={lang} setLang={setLang}
-        languages={languages}
         onContinue={() => setStep('main')}
-        geoAutoDetected={geoAutoDetected}
-        subtitle="Select the language you want to view this profile in."
+        subtitle={labels.gate_subtitleInfo}
       />
     )
   }
@@ -207,7 +167,7 @@ export default function InfoPage() {
             <rect x="1" y="8" width="18" height="4" rx="1" fill="var(--ink)" />
           </svg>
           <p style={{ fontSize: 13, color: 'var(--ink-4)', fontFamily: 'var(--mono)', letterSpacing: '0.02em' }}>
-            Loading profile…
+            {labels.info_loading}
           </p>
         </div>
       </div>
@@ -225,13 +185,13 @@ export default function InfoPage() {
             fontSize: 32, fontWeight: 600, letterSpacing: '-0.03em',
             color: 'var(--ink)', marginBottom: 8,
           }}>
-            {uiLabels.profileNotFound}
+            {labels.info_profileNotFound}
           </p>
           <p style={{ fontSize: 14, color: 'var(--ink-3)', lineHeight: 1.5, marginBottom: 24 }}>
-            This QR code may be invalid or the profile has been removed.
+            {labels.info_invalidQr}
           </p>
           <Link to="/" style={{ textDecoration: 'none' }}>
-            <Btn full={false}>Create a mediCode profile</Btn>
+            <Btn full={false}>{labels.info_createProfile}</Btn>
           </Link>
         </div>
       </div>
@@ -254,7 +214,7 @@ export default function InfoPage() {
           onClick={() => setStep('language')}
           style={{ fontSize: 12, color: 'var(--ink-3)', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
         >
-          <ArrowLeftIcon size={12} /> {uiLabels.exit}
+          <ArrowLeftIcon size={12} /> {labels.info_exit}
         </button>
         <BrandMark size={16} />
         <LangPill code={lang} label={langObj.label} onClick={() => setStep('language')} />
@@ -268,7 +228,7 @@ export default function InfoPage() {
             fontSize: 10, fontFamily: 'var(--mono)', letterSpacing: '0.1em',
             textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: 4,
           }}>
-            {uiLabels.patient}
+            {labels.info_patient}
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
             <div>
@@ -280,7 +240,7 @@ export default function InfoPage() {
                   fontSize: 11, color: 'rgba(255,255,255,0.5)',
                   fontFamily: 'var(--mono)', letterSpacing: '0.02em', marginTop: 4,
                 }}>
-                  {relativeTime(displayed.updatedAt, uiLabels)}
+                  {relativeTime(displayed.updatedAt, labels)}
                 </div>
               )}
             </div>
@@ -289,7 +249,7 @@ export default function InfoPage() {
                 fontSize: 9, fontFamily: 'var(--mono)', letterSpacing: '0.1em',
                 textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)',
               }}>
-                {uiLabels.bloodType}
+                {labels.info_bloodType}
               </div>
               {displayed.bloodType ? (
                 <div style={{
@@ -306,7 +266,7 @@ export default function InfoPage() {
                   borderRadius: 8, fontSize: 10, color: 'rgba(255,255,255,0.5)',
                   fontFamily: 'var(--mono)', letterSpacing: '0.04em',
                 }}>
-                  {uiLabels.bloodUnknown.toUpperCase()}
+                  {labels.info_bloodUnknown.toUpperCase()}
                 </div>
               )}
             </div>
@@ -325,7 +285,7 @@ export default function InfoPage() {
               fontSize: 10, color: 'var(--accent-ink)', fontFamily: 'var(--mono)',
               letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, fontWeight: 600,
             }}>
-              <AlertIcon size={11} /> {uiLabels.allergies}
+              <AlertIcon size={11} /> {labels.info_allergies}
             </div>
             <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--accent-ink)', letterSpacing: '-0.01em', lineHeight: 1.3 }}>
               {displayed.allergies}
@@ -341,7 +301,7 @@ export default function InfoPage() {
                 fontSize: 10, color: 'var(--ink-3)', fontFamily: 'var(--mono)',
                 letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 500,
               }}>
-                {uiLabels.voiceAlert} · {langObj.label}
+                {labels.info_voiceAlert} · {langObj.label}
               </div>
               <Chip tone="neutral">AI</Chip>
             </div>
@@ -386,7 +346,7 @@ export default function InfoPage() {
                   textDecoration: 'underline', textUnderlineOffset: 2,
                 }}
               >
-                {audioLoading ? 'Generating…' : 'Retry generation'}
+                {audioLoading ? labels.info_generating : labels.info_retryGeneration}
               </button>
             </div>
           )}
@@ -423,7 +383,7 @@ export default function InfoPage() {
                   fontSize: 10, fontFamily: 'var(--mono)', color: 'rgba(255,255,255,0.5)',
                   letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2,
                 }}>
-                  {uiLabels.emergencyContact}
+                  {labels.info_emergencyContact}
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 500, letterSpacing: '-0.01em' }}>
                   {displayed.emergencyContact || 'Contact'}{' '}
@@ -437,15 +397,15 @@ export default function InfoPage() {
           </a>
         )}
 
-        {displayed.conditions && <InfoRow label={uiLabels.conditions} value={displayed.conditions} />}
-        {displayed.medications && <InfoRow label={uiLabels.medications} value={displayed.medications} />}
+        {displayed.conditions && <InfoRow label={labels.info_conditions} value={displayed.conditions} />}
+        {displayed.medications && <InfoRow label={labels.info_medications} value={displayed.medications} />}
 
         {translating && (
           <p style={{
             fontSize: 11, textAlign: 'center', color: 'var(--ink-4)',
             fontFamily: 'var(--mono)', letterSpacing: '0.02em',
           }}>
-            Translating…
+            {labels.info_translating}
           </p>
         )}
 
