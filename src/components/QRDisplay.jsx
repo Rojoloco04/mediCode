@@ -1,14 +1,55 @@
 import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import WallpaperCard from './WallpaperCard'
+import { useTranslatedLabels } from '../lib/translate'
 import {
-  BrandMark, Chip, Btn, CheckIcon, ArrowRightIcon, ArrowLeftIcon, DownloadIcon, ShareIcon,
+  BrandMark, Chip, Btn, CheckIcon, ArrowRightIcon, ArrowLeftIcon,
+  DownloadIcon, ShareIcon, LangPill, LanguageGate,
 } from './ui'
+
+const QR_LABELS = {
+  langTitle: 'Choose your language',
+  langSubtitle: 'Used for form labels and, in an emergency, the translated profile shown to responders.',
+  langContinue: 'Continue',
+  edit: 'Edit',
+  back: 'Back',
+  saved: 'Saved',
+  title: 'Your code is ready',
+  desc: 'Print it, save it to your wallet, or set it as your lock screen.',
+  scanned: 'Scanned by any camera.',
+  wallpaperBtn: 'Create lock-screen wallpaper',
+  svgBtn: 'SVG',
+  shareBtn: 'Share',
+  reveals: 'What the QR reveals',
+  fieldName: 'Name',
+  fieldBlood: 'Blood type',
+  fieldAllergies: 'Allergies',
+  fieldConditions: 'Conditions',
+  fieldEmergency: 'Emergency',
+  fieldUnknown: 'Unknown',
+  wallpaperTitle: 'Lock-screen wallpaper',
+  wallpaperDesc: 'Exports at 1080×2340 — fits any modern phone.',
+}
 
 export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onLangChange, onBack }) {
   const [screen, setScreen] = useState('qr')
+  const labels = useTranslatedLabels(QR_LABELS, lang)
+  const langObj = languages.find(l => l.code === lang) || { label: 'English' }
   const url = `${window.location.origin}/${uuid}`
   const shortUrl = `${window.location.hostname}/${uuid.slice(0, 8)}`
+
+  if (screen === 'language') {
+    return (
+      <LanguageGate
+        lang={lang} setLang={onLangChange}
+        languages={languages}
+        onContinue={() => setScreen('qr')}
+        title={labels.langTitle}
+        subtitle={labels.langSubtitle}
+        continueLabel={labels.langContinue}
+      />
+    )
+  }
 
   if (screen === 'wallpaper') {
     return (
@@ -22,7 +63,7 @@ export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onL
               onClick={() => setScreen('qr')}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--ink-2)', cursor: 'pointer' }}
             >
-              <ArrowLeftIcon size={14} /> Back
+              <ArrowLeftIcon size={14} /> {labels.back}
             </button>
             <BrandMark />
             <div style={{ width: 40 }} />
@@ -33,10 +74,10 @@ export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onL
               margin: 0, fontSize: 24, fontWeight: 600, letterSpacing: '-0.025em',
               lineHeight: 1.1, color: 'var(--ink)',
             }}>
-              Lock-screen wallpaper
+              {labels.wallpaperTitle}
             </h1>
             <p style={{ margin: '6px 0 0', fontSize: 13, color: 'var(--ink-3)', lineHeight: 1.5 }}>
-              Exports at 1080×2340 — fits any modern phone.
+              {labels.wallpaperDesc}
             </p>
           </div>
 
@@ -61,24 +102,24 @@ export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onL
             onClick={onBack}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--ink-2)', cursor: 'pointer' }}
           >
-            <ArrowLeftIcon size={14} /> Edit
+            <ArrowLeftIcon size={14} /> {labels.edit}
           </button>
           <BrandMark />
-          <div style={{ width: 40 }} />
+          <LangPill code={lang} label={langObj.label} onClick={() => setScreen('language')} />
         </div>
 
         <div style={{ padding: '28px 24px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <Chip tone="good"><CheckIcon size={10} /> Saved</Chip>
+            <Chip tone="good"><CheckIcon size={10} /> {labels.saved}</Chip>
           </div>
           <h1 style={{
             margin: 0, fontSize: 26, fontWeight: 600, letterSpacing: '-0.025em',
             lineHeight: 1.1, color: 'var(--ink)',
           }}>
-            Your code is ready
+            {labels.title}
           </h1>
           <p style={{ margin: '6px 0 0', fontSize: 14, color: 'var(--ink-3)', lineHeight: 1.5 }}>
-            Print it, save it to your wallet, or set it as your lock screen.
+            {labels.desc}
           </p>
         </div>
 
@@ -101,7 +142,7 @@ export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onL
               margin: '14px 0 0', fontSize: 13, color: 'var(--ink-3)',
               textAlign: 'center', lineHeight: 1.5, maxWidth: 260,
             }}>
-              Scanned by any camera. Opens{' '}
+              {labels.scanned}{' '}
               {form.name
                 ? <><strong style={{ color: 'var(--ink-2)', fontWeight: 500 }}>{form.name}</strong>'s</>
                 : 'your'
@@ -113,7 +154,7 @@ export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onL
         {/* Actions */}
         <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 28 }}>
           <Btn onClick={() => setScreen('wallpaper')} icon={<ArrowRightIcon size={16} />}>
-            Create lock-screen wallpaper
+            {labels.wallpaperBtn}
           </Btn>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <Btn
@@ -129,7 +170,7 @@ export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onL
                 a.click()
               }}
             >
-              SVG
+              {labels.svgBtn}
             </Btn>
             <Btn
               variant="ghost" size="sm"
@@ -139,7 +180,7 @@ export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onL
                 else navigator.clipboard?.writeText(url)
               }}
             >
-              Share
+              {labels.shareBtn}
             </Btn>
           </div>
         </div>
@@ -150,15 +191,15 @@ export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onL
             fontSize: 11, color: 'var(--ink-3)', fontFamily: 'var(--mono)',
             letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10,
           }}>
-            What the QR reveals
+            {labels.reveals}
           </div>
           <div style={{ border: '1px solid var(--line-2)', borderRadius: 12, background: 'var(--paper-2)' }}>
             {[
-              ['Name', form.name || '—'],
-              ['Blood type', form.bloodType || 'Unknown'],
-              ['Allergies', form.allergies || 'None noted'],
-              ['Conditions', form.conditions || '—'],
-              ['Emergency', form.emergencyContact
+              [labels.fieldName, form.name || '—'],
+              [labels.fieldBlood, form.bloodType || labels.fieldUnknown],
+              [labels.fieldAllergies, form.allergies || '—'],
+              [labels.fieldConditions, form.conditions || '—'],
+              [labels.fieldEmergency, form.emergencyContact
                 ? `${form.emergencyContact}${form.emergencyPhone ? ' · ' + form.emergencyPhone : ''}`
                 : '—'],
             ].map(([k, v], i, arr) => (

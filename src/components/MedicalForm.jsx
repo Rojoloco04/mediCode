@@ -8,8 +8,23 @@ import {
 } from './ui'
 
 const FORM_LABELS = {
+  langTitle: 'Choose your language',
+  langSubtitle: 'Used for form labels and, in an emergency, the translated profile shown to responders.',
+  langContinue: 'Continue',
+  pageTitle: 'Your medical profile',
+  pageDesc: 'Kept private until a QR code is scanned — then shown to responders in their language.',
+  haveProfile: 'Have a profile already?',
+  lookupPlaceholder: 'your@email.com',
+  find: 'Find',
+  noProfileFound: 'No profile found for that email.',
+  draft: 'Draft',
+  editingChip: 'Editing existing',
+  editingExisting: 'Editing existing profile',
+  createNew: 'Create new',
+  footerText: 'end-to-end encrypted · visible only on scan',
   fullName: 'Full name',
   email: 'Email',
+  emailHint: 'used to retrieve later',
   bloodType: 'Blood type',
   allergies: 'Allergies',
   conditions: 'Conditions',
@@ -21,6 +36,13 @@ const FORM_LABELS = {
   sectionMedical: 'Medical',
   sectionMedicalDesc: 'Optional context for treatment.',
   sectionEmergency: 'Emergency contact',
+  phName: 'As it appears on your ID',
+  phEmail: 'you@email.com',
+  phAllergies: 'Penicillin, peanuts, latex',
+  phConditions: 'Type 1 diabetes, asthma',
+  phMedications: 'Insulin 10u, Albuterol PRN',
+  phEmergencyName: 'Jane Doe',
+  phEmergencyPhone: '+1 555 000 0000',
   generateBtn: 'Generate QR code',
   updateBtn: 'Update QR code',
   saving: 'Saving…',
@@ -74,7 +96,7 @@ export default function MedicalForm() {
     const { data, error } = await supabase
       .from('profiles').select('*').eq('email', lookupEmail.trim().toLowerCase()).single()
     if (error || !data) {
-      setLookupError('No profile found for that email.')
+      setLookupError(labels.noProfileFound)
       setLooking(false)
       return
     }
@@ -135,6 +157,9 @@ export default function MedicalForm() {
         languages={languages}
         onContinue={() => setStep('form')}
         geoAutoDetected={geoAutoDetected}
+        title={labels.langTitle}
+        subtitle={labels.langSubtitle}
+        continueLabel={labels.langContinue}
       />
     )
   }
@@ -170,17 +195,17 @@ export default function MedicalForm() {
         {/* Title */}
         <div style={{ padding: '24px 24px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <Chip tone="neutral">Draft</Chip>
-            {existingUuid && <Chip tone="good"><CheckIcon size={10} /> Editing existing</Chip>}
+            <Chip tone="neutral">{labels.draft}</Chip>
+            {existingUuid && <Chip tone="good"><CheckIcon size={10} /> {labels.editingChip}</Chip>}
           </div>
           <h1 style={{
             margin: 0, fontSize: 26, fontWeight: 600, letterSpacing: '-0.025em',
             color: 'var(--ink)', lineHeight: 1.1,
           }}>
-            Your medical profile
+            {labels.pageTitle}
           </h1>
           <p style={{ margin: '6px 0 0', fontSize: 14, color: 'var(--ink-3)', lineHeight: 1.5 }}>
-            Kept private until a QR code is scanned — then shown to responders in their language.
+            {labels.pageDesc}
           </p>
         </div>
 
@@ -195,14 +220,14 @@ export default function MedicalForm() {
                 fontSize: 11, color: 'var(--ink-3)', fontFamily: 'var(--mono)',
                 letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8,
               }}>
-                Have a profile already?
+                {labels.haveProfile}
               </div>
               <form onSubmit={handleLookup} style={{ display: 'flex', gap: 8 }}>
                 <input
                   type="email"
                   value={lookupEmail}
                   onChange={e => { setLookupEmail(e.target.value); setLookupError(null) }}
-                  placeholder="your@email.com"
+                  placeholder={labels.lookupPlaceholder}
                   style={{
                     flex: 1, padding: '9px 11px', borderRadius: 9,
                     border: '1px solid var(--line)', background: 'var(--paper)',
@@ -211,7 +236,7 @@ export default function MedicalForm() {
                 />
                 <Btn variant="ghost" full={false} size="sm" type="submit"
                   disabled={looking || !lookupEmail.trim()}>
-                  {looking ? '…' : 'Find'}
+                  {looking ? '…' : labels.find}
                 </Btn>
               </form>
               {lookupError && (
@@ -229,7 +254,7 @@ export default function MedicalForm() {
               display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
             }}>
               <div style={{ fontSize: 13, color: 'var(--good)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <CheckIcon size={14} /> Editing existing profile
+                <CheckIcon size={14} /> {labels.editingExisting}
               </div>
               <button
                 onClick={() => { setExistingUuid(null); setForm(EMPTY_FORM) }}
@@ -238,7 +263,7 @@ export default function MedicalForm() {
                   textUnderlineOffset: 2, cursor: 'pointer',
                 }}
               >
-                Create new
+                {labels.createNew}
               </button>
             </div>
           </div>
@@ -260,12 +285,12 @@ export default function MedicalForm() {
             <SectionHeader num={1} title={labels.sectionCritical} desc={labels.sectionCriticalDesc} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <Field label={labels.fullName} name="name" value={form.name} onChange={handleChange}
-                placeholder="As it appears on your ID" required />
+                placeholder={labels.phName} required />
               <Field label={labels.email} name="email" type="email" value={form.email} onChange={handleChange}
-                placeholder="you@email.com" hint="used to retrieve later" />
+                placeholder={labels.phEmail} hint={labels.emailHint} />
               <BloodPicker value={form.bloodType} onChange={v => setForm(f => ({ ...f, bloodType: v }))} />
               <Field label={labels.allergies} name="allergies" value={form.allergies} onChange={handleChange}
-                placeholder="Penicillin, peanuts, latex" />
+                placeholder={labels.phAllergies} />
             </div>
           </div>
 
@@ -273,9 +298,9 @@ export default function MedicalForm() {
             <SectionHeader num={2} title={labels.sectionMedical} desc={labels.sectionMedicalDesc} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <Field label={labels.conditions} name="conditions" value={form.conditions} onChange={handleChange}
-                placeholder="Type 1 diabetes, asthma" />
+                placeholder={labels.phConditions} />
               <Field label={labels.medications} name="medications" value={form.medications} onChange={handleChange}
-                placeholder="Insulin 10u, Albuterol PRN" />
+                placeholder={labels.phMedications} />
             </div>
           </div>
 
@@ -283,9 +308,9 @@ export default function MedicalForm() {
             <SectionHeader num={3} title={labels.sectionEmergency} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <Field label={labels.emergencyName} name="emergencyContact" value={form.emergencyContact}
-                onChange={handleChange} placeholder="Jane Doe" />
+                onChange={handleChange} placeholder={labels.phEmergencyName} />
               <Field label={labels.emergencyPhone} name="emergencyPhone" value={form.emergencyPhone}
-                onChange={handleChange} placeholder="+1 555 000 0000" />
+                onChange={handleChange} placeholder={labels.phEmergencyPhone} />
             </div>
           </div>
 
@@ -297,7 +322,7 @@ export default function MedicalForm() {
             display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'center',
             fontFamily: 'var(--mono)', letterSpacing: '0.02em',
           }}>
-            <LockIcon size={10} /> end-to-end encrypted · visible only on scan
+            <LockIcon size={10} /> {labels.footerText}
           </p>
         </form>
 
