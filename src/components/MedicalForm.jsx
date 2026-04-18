@@ -195,7 +195,7 @@ export default function MedicalForm() {
         {/* Title */}
         <div style={{ padding: '24px 24px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <Chip tone="neutral">{labels.draft}</Chip>
+            {!existingUuid && <Chip tone="neutral">{labels.draft}</Chip>}
             {existingUuid && <Chip tone="good"><CheckIcon size={10} /> {labels.editingChip}</Chip>}
           </div>
           <h1 style={{
