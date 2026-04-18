@@ -144,6 +144,7 @@ function InfoRow({ label, value }) {
 export default function InfoPage() {
   const { uuid } = useParams()
   const [step, setStep] = useState('language')
+  const [authorized, setAuthorized] = useState(false)
   const [lang, setLang] = useState(() => {
     if (typeof navigator === 'undefined') return 'en'
     return navigator.language?.split('-')[0]?.toLowerCase() || 'en'
@@ -249,14 +250,14 @@ export default function InfoPage() {
       <LanguageGate
         lang={lang} setLang={setLang}
         languages={languages}
-        onContinue={() => setStep('auth')}
+        onContinue={() => setStep(authorized ? 'main' : 'auth')}
         geoAutoDetected={geoAutoDetected}
       />
     )
   }
 
   if (step === 'auth') {
-    return <AuthGate onAuthorized={() => setStep('main')} />
+    return <AuthGate onAuthorized={() => { setAuthorized(true); setStep('main') }} />
   }
 
   if (loading) {

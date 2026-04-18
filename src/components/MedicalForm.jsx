@@ -1,11 +1,30 @@
 import { useState, useEffect } from 'react'
 import QRDisplay from './QRDisplay'
 import { supabase } from '../lib/supabase'
-import { fetchLanguages, getLocationLanguage } from '../lib/translate'
+import { fetchLanguages, getLocationLanguage, useTranslatedLabels } from '../lib/translate'
 import {
   BrandMark, Chip, Btn, Field, LangPill, LanguageGate,
   SectionHeader, BloodPicker, ArrowRightIcon, LockIcon, CheckIcon,
 } from './ui'
+
+const FORM_LABELS = {
+  fullName: 'Full name',
+  email: 'Email',
+  bloodType: 'Blood type',
+  allergies: 'Allergies',
+  conditions: 'Conditions',
+  medications: 'Current medications',
+  emergencyName: 'Name',
+  emergencyPhone: 'Phone',
+  sectionCritical: 'Critical',
+  sectionCriticalDesc: 'Shown first to responders.',
+  sectionMedical: 'Medical',
+  sectionMedicalDesc: 'Optional context for treatment.',
+  sectionEmergency: 'Emergency contact',
+  generateBtn: 'Generate QR code',
+  updateBtn: 'Update QR code',
+  saving: 'Saving…',
+}
 
 const EMPTY_FORM = {
   name: '', email: '', bloodType: '',
@@ -29,6 +48,7 @@ export default function MedicalForm() {
   })
   const [geoAutoDetected, setGeoAutoDetected] = useState(false)
   const [languages, setLanguages] = useState([{ code: 'en', label: 'English' }])
+  const labels = useTranslatedLabels(FORM_LABELS, lang)
 
   useEffect(() => {
     fetchLanguages()
@@ -237,40 +257,40 @@ export default function MedicalForm() {
           )}
 
           <div style={{ marginBottom: 28 }}>
-            <SectionHeader num={1} title="Critical" desc="Shown first to responders." />
+            <SectionHeader num={1} title={labels.sectionCritical} desc={labels.sectionCriticalDesc} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <Field label="Full name" name="name" value={form.name} onChange={handleChange}
+              <Field label={labels.fullName} name="name" value={form.name} onChange={handleChange}
                 placeholder="As it appears on your ID" required />
-              <Field label="Email" name="email" type="email" value={form.email} onChange={handleChange}
+              <Field label={labels.email} name="email" type="email" value={form.email} onChange={handleChange}
                 placeholder="you@email.com" hint="used to retrieve later" />
               <BloodPicker value={form.bloodType} onChange={v => setForm(f => ({ ...f, bloodType: v }))} />
-              <Field label="Allergies" name="allergies" value={form.allergies} onChange={handleChange}
+              <Field label={labels.allergies} name="allergies" value={form.allergies} onChange={handleChange}
                 placeholder="Penicillin, peanuts, latex" />
             </div>
           </div>
 
           <div style={{ marginBottom: 28 }}>
-            <SectionHeader num={2} title="Medical" desc="Optional context for treatment." />
+            <SectionHeader num={2} title={labels.sectionMedical} desc={labels.sectionMedicalDesc} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <Field label="Conditions" name="conditions" value={form.conditions} onChange={handleChange}
+              <Field label={labels.conditions} name="conditions" value={form.conditions} onChange={handleChange}
                 placeholder="Type 1 diabetes, asthma" />
-              <Field label="Current medications" name="medications" value={form.medications} onChange={handleChange}
+              <Field label={labels.medications} name="medications" value={form.medications} onChange={handleChange}
                 placeholder="Insulin 10u, Albuterol PRN" />
             </div>
           </div>
 
           <div style={{ marginBottom: 28 }}>
-            <SectionHeader num={3} title="Emergency contact" />
+            <SectionHeader num={3} title={labels.sectionEmergency} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <Field label="Name" name="emergencyContact" value={form.emergencyContact}
+              <Field label={labels.emergencyName} name="emergencyContact" value={form.emergencyContact}
                 onChange={handleChange} placeholder="Jane Doe" />
-              <Field label="Phone" name="emergencyPhone" value={form.emergencyPhone}
+              <Field label={labels.emergencyPhone} name="emergencyPhone" value={form.emergencyPhone}
                 onChange={handleChange} placeholder="+1 555 000 0000" />
             </div>
           </div>
 
           <Btn type="submit" disabled={saving || !form.name.trim()} icon={<ArrowRightIcon size={16} />}>
-            {saving ? 'Saving…' : existingUuid ? 'Update QR code' : 'Generate QR code'}
+            {saving ? labels.saving : existingUuid ? labels.updateBtn : labels.generateBtn}
           </Btn>
           <p style={{
             fontSize: 11, color: 'var(--ink-4)', textAlign: 'center', marginTop: 12,
