@@ -37,6 +37,14 @@ const FORM_LABELS = {
   saving: 'Saving…',
   update: 'Update My QR Code →',
   generate: 'Generate My QR Code →',
+  phLookupEmail: 'Enter your email',
+  phFullName: 'As it appears on your ID',
+  phEmail: 'Used to retrieve your profile later',
+  phAllergies: 'e.g. Penicillin, peanuts, latex',
+  phConditions: 'e.g. Type 1 Diabetes, Asthma',
+  phMedications: 'e.g. Insulin 10u, Albuterol PRN',
+  phEmergencyContact: 'Jane Doe',
+  phEmergencyPhone: '+1 555 000 0000',
 }
 
 export default function MedicalForm() {
@@ -178,7 +186,7 @@ export default function MedicalForm() {
                   type="email"
                   value={lookupEmail}
                   onChange={(e) => { setLookupEmail(e.target.value); setLookupError(null) }}
-                  placeholder="Enter your email"
+                  placeholder={labels.phLookupEmail}
                   className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 placeholder:text-gray-300"
                 />
                 <button
@@ -217,8 +225,8 @@ export default function MedicalForm() {
               <h2 className="text-xs font-semibold text-red-600 uppercase tracking-widest">
                 {labels.criticalInfo}
               </h2>
-              <Field label={labels.fullName} name="name" value={form.name} onChange={handleChange} required placeholder="As it appears on your ID" />
-              <Field label={labels.email} name="email" value={form.email} onChange={handleChange} placeholder="Used to retrieve your profile later" type="email" />
+              <Field label={labels.fullName} name="name" value={form.name} onChange={handleChange} required placeholder={labels.phFullName} />
+              <Field label={labels.email} name="email" value={form.email} onChange={handleChange} placeholder={labels.phEmail} type="email" />
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{labels.bloodType}</label>
                 <select
@@ -238,7 +246,7 @@ export default function MedicalForm() {
                 name="allergies"
                 value={form.allergies}
                 onChange={handleChange}
-                placeholder="e.g. Penicillin, peanuts, latex"
+                placeholder={labels.phAllergies}
               />
             </section>
 
@@ -247,11 +255,11 @@ export default function MedicalForm() {
               <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
                 {labels.additionalDetails}
               </h2>
-              <Field label={labels.conditions} name="conditions" value={form.conditions} onChange={handleChange} placeholder="e.g. Type 1 Diabetes, Asthma" />
-              <Field label={labels.medications} name="medications" value={form.medications} onChange={handleChange} placeholder="e.g. Insulin 10u, Albuterol PRN" />
+              <Field label={labels.conditions} name="conditions" value={form.conditions} onChange={handleChange} placeholder={labels.phConditions} />
+              <Field label={labels.medications} name="medications" value={form.medications} onChange={handleChange} placeholder={labels.phMedications} />
               <div className="grid grid-cols-2 gap-3">
-                <Field label={labels.emergencyContact} name="emergencyContact" value={form.emergencyContact} onChange={handleChange} placeholder="Jane Doe" />
-                <Field label={labels.emergencyPhone} name="emergencyPhone" value={form.emergencyPhone} onChange={handleChange} placeholder="+1 555 000 0000" />
+                <Field label={labels.emergencyContact} name="emergencyContact" value={form.emergencyContact} onChange={handleChange} placeholder={labels.phEmergencyContact} />
+                <Field label={labels.emergencyPhone} name="emergencyPhone" value={form.emergencyPhone} onChange={handleChange} placeholder={labels.phEmergencyPhone} />
               </div>
             </section>
 
