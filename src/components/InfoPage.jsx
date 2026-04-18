@@ -7,7 +7,7 @@ import { useLabels } from '../lib/LabelsContext'
 import {
   BrandMark, Chip, Btn, LangPill, LanguageGate,
   CheckIcon, AlertIcon, PhoneIcon,
-  ArrowRightIcon, ArrowLeftIcon, PlayIcon, PauseIcon,
+  ArrowRightIcon, ArrowLeftIcon, PlayIcon, PauseIcon, DownloadIcon,
 } from './ui'
 
 const TRANSLATABLE = ['allergies', 'conditions', 'medications']
@@ -202,9 +202,13 @@ export default function InfoPage() {
 
   return (
     <div style={{ minHeight: '100dvh', background: 'var(--paper)' }}>
+      <style>{`@media print {
+        .no-print { display: none !important; }
+        body { background: #fff; }
+      }`}</style>
 
       {/* Sticky header */}
-      <div style={{
+      <div className="no-print" style={{
         padding: '14px 20px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         borderBottom: '1px solid var(--line-2)',
@@ -217,7 +221,20 @@ export default function InfoPage() {
           <ArrowLeftIcon size={12} /> {labels.info_exit}
         </button>
         <BrandMark size={16} />
-        <LangPill code={lang} label={langObj.label} onClick={() => setStep('language')} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            onClick={() => window.print()}
+            title={labels.info_downloadPdf}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              fontSize: 12, color: 'var(--ink-3)', cursor: 'pointer',
+              fontFamily: 'var(--mono)', letterSpacing: '0.02em',
+            }}
+          >
+            <DownloadIcon size={13} />
+          </button>
+          <LangPill code={lang} label={langObj.label} onClick={() => setStep('language')} />
+        </div>
       </div>
 
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 20px 48px', display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -294,7 +311,7 @@ export default function InfoPage() {
         )}
 
         {/* Voice alert */}
-        <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden' }}>
+        <div className="no-print" style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden' }}>
           <div style={{ padding: '14px 16px 12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <div style={{
