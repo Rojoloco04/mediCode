@@ -1,3 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --paper: oklch(98.2% 0.004 70);
+  --paper-2: oklch(96.4% 0.005 70);
+  --line: oklch(89% 0.006 70);
+  --line-2: oklch(93% 0.006 70);
+  --ink: oklch(20% 0.012 60);
+  --ink-2: oklch(38% 0.01 60);
+  --ink-3: oklch(58% 0.008 60);
+  --ink-4: oklch(78% 0.006 60);
+  --accent: oklch(60% 0.175 25);
+  --accent-soft: oklch(94% 0.032 25);
+  --accent-ink: oklch(42% 0.17 25);
+  --good: oklch(55% 0.11 155);
+  --good-soft: oklch(95% 0.03 155);
+  --ui: 'Inter Tight', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Inter Tight', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; padding: 0; }
+input, textarea, select { font-family: inherit; color: inherit; }
+input:focus, textarea:focus, select:focus { outline: none; }

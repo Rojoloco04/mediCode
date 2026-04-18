@@ -1,53 +1,16 @@
 import { useState, useEffect } from 'react'
 import QRDisplay from './QRDisplay'
 import { supabase } from '../lib/supabase'
-import { fetchLanguages, useTranslatedLabels, getLocationLanguage } from '../lib/translate'
-
-const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+import { fetchLanguages, getLocationLanguage } from '../lib/translate'
+import {
+  BrandMark, Chip, Btn, Field, LangPill, LanguageGate,
+  SectionHeader, BloodPicker, ArrowRightIcon, LockIcon, CheckIcon,
+} from './ui'
 
 const EMPTY_FORM = {
-  name: '',
-  email: '',
-  bloodType: '',
-  allergies: '',
-  conditions: '',
-  medications: '',
-  emergencyContact: '',
-  emergencyPhone: '',
-}
-
-const FORM_LABELS = {
-  languageTitle: 'Select Language',
-  languageSubtitle: 'Choose the language for this session',
-  continueBtn: 'Continue',
-  subtitle: 'Your medical profile, scannable in any language.',
-  alreadyHaveProfile: 'Already have a profile?',
-  find: 'Find',
-  noProfileFound: 'No profile found for that email.',
-  editingExisting: 'Editing existing profile',
-  createNewInstead: 'Create new instead',
-  criticalInfo: 'Critical Information',
-  fullName: 'Full Name',
-  email: 'Email',
-  bloodType: 'Blood Type',
-  bloodUnknown: 'Unknown',
-  allergies: 'Allergies',
-  additionalDetails: 'Additional Details',
-  conditions: 'Medical Conditions',
-  medications: 'Current Medications',
-  emergencyContact: 'Emergency Contact',
-  emergencyPhone: 'Their Phone',
-  saving: 'Saving…',
-  update: 'Update My QR Code →',
-  generate: 'Generate My QR Code →',
-  phLookupEmail: 'Enter your email',
-  phFullName: 'As it appears on your ID',
-  phEmail: 'Used to retrieve your profile later',
-  phAllergies: 'e.g. Penicillin, peanuts, latex',
-  phConditions: 'e.g. Type 1 Diabetes, Asthma',
-  phMedications: 'e.g. Insulin 10u, Albuterol PRN',
-  phEmergencyContact: 'Jane Doe',
-  phEmergencyPhone: '+1 555 000 0000',
+  name: '', email: '', bloodType: '',
+  allergies: '', conditions: '', medications: '',
+  emergencyContact: '', emergencyPhone: '',
 }
 
 export default function MedicalForm() {
@@ -60,30 +23,28 @@ export default function MedicalForm() {
   const [lookupEmail, setLookupEmail] = useState('')
   const [looking, setLooking] = useState(false)
   const [lookupError, setLookupError] = useState(null)
-
   const [lang, setLang] = useState(() => {
     if (typeof navigator === 'undefined') return 'en'
     return navigator.language?.split('-')[0]?.toLowerCase() || 'en'
   })
   const [geoAutoDetected, setGeoAutoDetected] = useState(false)
   const [languages, setLanguages] = useState([{ code: 'en', label: 'English' }])
-  const labels = useTranslatedLabels(FORM_LABELS, lang)
 
   useEffect(() => {
     fetchLanguages()
-      .then((langs) => setLanguages([{ code: 'en', label: 'English' }, ...langs.filter((l) => l.code !== 'en')]))
+      .then(langs => setLanguages([{ code: 'en', label: 'English' }, ...langs.filter(l => l.code !== 'en')]))
       .catch(() => {})
   }, [])
 
   useEffect(() => {
     if (typeof navigator !== 'undefined' && navigator.language) return
-    getLocationLanguage().then((detected) => {
+    getLocationLanguage().then(detected => {
       if (detected) { setLang(detected); setGeoAutoDetected(true) }
     })
   }, [])
 
   function handleChange(e) {
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
+    setForm(f => ({ ...f, [e.target.name]: e.target.value }))
   }
 
   async function handleLookup(e) {
@@ -91,24 +52,17 @@ export default function MedicalForm() {
     setLooking(true)
     setLookupError(null)
     const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('email', lookupEmail.trim().toLowerCase())
-      .single()
+      .from('profiles').select('*').eq('email', lookupEmail.trim().toLowerCase()).single()
     if (error || !data) {
-      setLookupError(labels.noProfileFound)
+      setLookupError('No profile found for that email.')
       setLooking(false)
       return
     }
     setForm({
-      name: data.name || '',
-      email: data.email || '',
-      bloodType: data.blood_type || '',
-      allergies: data.allergies || '',
-      conditions: data.conditions || '',
-      medications: data.medications || '',
-      emergencyContact: data.emergency_contact || '',
-      emergencyPhone: data.emergency_phone || '',
+      name: data.name || '', email: data.email || '',
+      bloodType: data.blood_type || '', allergies: data.allergies || '',
+      conditions: data.conditions || '', medications: data.medications || '',
+      emergencyContact: data.emergency_contact || '', emergencyPhone: data.emergency_phone || '',
     })
     setExistingUuid(data.id)
     setLooking(false)
@@ -130,43 +84,24 @@ export default function MedicalForm() {
     }
     if (existingUuid) {
       const { error } = await supabase.from('profiles').update(fields).eq('id', existingUuid)
-      if (error) {
-        setError('Could not update your profile. Please try again.')
-        setSaving(false)
-        return
-      }
+      if (error) { setError('Could not update profile. Please try again.'); setSaving(false); return }
       setUuid(existingUuid)
     } else {
       const email = form.email.trim().toLowerCase()
       let resolvedUuid = null
-
       if (email) {
-        const { data: existing } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('email', email)
-          .single()
+        const { data: existing } = await supabase.from('profiles').select('id').eq('email', email).single()
         if (existing) {
           const { error } = await supabase.from('profiles').update(fields).eq('id', existing.id)
-          if (error) {
-            setError('Could not update your profile. Please try again.')
-            setSaving(false)
-            return
-          }
+          if (error) { setError('Could not update profile. Please try again.'); setSaving(false); return }
           resolvedUuid = existing.id
         }
       }
-
       if (!resolvedUuid) {
         const { data, error } = await supabase.from('profiles').insert(fields).select('id').single()
-        if (error) {
-          setError('Could not save your profile. Please try again.')
-          setSaving(false)
-          return
-        }
+        if (error) { setError('Could not save profile. Please try again.'); setSaving(false); return }
         resolvedUuid = data.id
       }
-
       setExistingUuid(resolvedUuid)
       setUuid(resolvedUuid)
     }
@@ -175,187 +110,178 @@ export default function MedicalForm() {
 
   if (step === 'language') {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <div className="bg-gray-800 rounded-2xl p-8 w-full max-w-xs shadow-xl space-y-5">
-          <div className="text-center space-y-1">
-            <p className="text-3xl">🌐</p>
-            <p className="text-white font-bold text-lg">{labels.languageTitle}</p>
-            <p className="text-gray-400 text-sm">{labels.languageSubtitle}</p>
-          </div>
-          <select
-            value={lang}
-            onChange={(e) => setLang(e.target.value)}
-            className="w-full bg-gray-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-          >
-            {languages.map((l) => (
-              <option key={l.code} value={l.code}>{l.label}</option>
-            ))}
-          </select>
-          {geoAutoDetected && (
-            <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
-              <span>📍</span> Language automatically selected based on your location
-            </p>
-          )}
-          <button
-            onClick={() => setStep('form')}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl text-sm transition-colors"
-          >
-            {labels.continueBtn}
-          </button>
-        </div>
-      </div>
+      <LanguageGate
+        lang={lang} setLang={setLang}
+        languages={languages}
+        onContinue={() => setStep('form')}
+        geoAutoDetected={geoAutoDetected}
+      />
     )
   }
 
   if (uuid) {
     return (
       <QRDisplay
-        uuid={uuid}
-        form={form}
-        lang={lang}
-        languages={languages}
+        uuid={uuid} form={form}
+        lang={lang} languages={languages}
         onLangChange={setLang}
         onBack={() => setUuid(null)}
       />
     )
   }
 
+  const langObj = languages.find(l => l.code === lang) || { label: 'English' }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg overflow-hidden">
-        <div className="bg-red-600 px-8 py-6">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <span className="text-white text-2xl">⚕</span>
-              <h1 className="text-2xl font-bold text-white">mediCode</h1>
-            </div>
-            <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value)}
-              className="text-sm bg-red-700 text-white border border-red-500 rounded-lg px-2 py-1 focus:outline-none"
-            >
-              {languages.map((l) => (
-                <option key={l.code} value={l.code}>{l.label}</option>
-              ))}
-            </select>
-          </div>
-          <p className="text-red-100 text-sm">{labels.subtitle}</p>
+    <div style={{ minHeight: '100dvh', background: 'var(--paper)' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+
+        {/* Sticky header */}
+        <div style={{
+          padding: '16px 24px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          borderBottom: '1px solid var(--line-2)',
+          position: 'sticky', top: 0, background: 'var(--paper)', zIndex: 5,
+        }}>
+          <BrandMark />
+          <LangPill code={lang} label={langObj.label} onClick={() => setStep('language')} />
         </div>
 
-        <div className="px-8 py-6 space-y-6">
-          {!existingUuid && (
-            <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 space-y-2">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">{labels.alreadyHaveProfile}</p>
-              <form onSubmit={handleLookup} className="flex gap-2">
+        {/* Title */}
+        <div style={{ padding: '24px 24px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <Chip tone="neutral">Draft</Chip>
+            {existingUuid && <Chip tone="good"><CheckIcon size={10} /> Editing existing</Chip>}
+          </div>
+          <h1 style={{
+            margin: 0, fontSize: 26, fontWeight: 600, letterSpacing: '-0.025em',
+            color: 'var(--ink)', lineHeight: 1.1,
+          }}>
+            Your medical profile
+          </h1>
+          <p style={{ margin: '6px 0 0', fontSize: 14, color: 'var(--ink-3)', lineHeight: 1.5 }}>
+            Kept private until a QR code is scanned — then shown to responders in their language.
+          </p>
+        </div>
+
+        {/* Lookup */}
+        {!existingUuid && (
+          <div style={{ padding: '0 24px 16px' }}>
+            <div style={{
+              background: 'var(--paper-2)', border: '1px solid var(--line-2)',
+              borderRadius: 12, padding: 14,
+            }}>
+              <div style={{
+                fontSize: 11, color: 'var(--ink-3)', fontFamily: 'var(--mono)',
+                letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8,
+              }}>
+                Have a profile already?
+              </div>
+              <form onSubmit={handleLookup} style={{ display: 'flex', gap: 8 }}>
                 <input
                   type="email"
                   value={lookupEmail}
-                  onChange={(e) => { setLookupEmail(e.target.value); setLookupError(null) }}
-                  placeholder={labels.phLookupEmail}
-                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 placeholder:text-gray-300"
+                  onChange={e => { setLookupEmail(e.target.value); setLookupError(null) }}
+                  placeholder="your@email.com"
+                  style={{
+                    flex: 1, padding: '9px 11px', borderRadius: 9,
+                    border: '1px solid var(--line)', background: 'var(--paper)',
+                    fontSize: 13, letterSpacing: '-0.01em', color: 'var(--ink)',
+                  }}
                 />
-                <button
-                  type="submit"
-                  disabled={looking || !lookupEmail.trim()}
-                  className="bg-gray-800 hover:bg-gray-900 disabled:opacity-40 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
-                >
-                  {looking ? '…' : labels.find}
-                </button>
+                <Btn variant="ghost" full={false} size="sm" type="submit"
+                  disabled={looking || !lookupEmail.trim()}>
+                  {looking ? '…' : 'Find'}
+                </Btn>
               </form>
-              {lookupError && <p className="text-red-500 text-xs">{lookupError}</p>}
+              {lookupError && (
+                <p style={{ margin: '8px 0 0', fontSize: 12, color: 'var(--accent)' }}>{lookupError}</p>
+              )}
             </div>
-          )}
+          </div>
+        )}
 
-          {existingUuid && (
-            <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-3 flex items-center justify-between">
-              <span>{labels.editingExisting}</span>
+        {existingUuid && (
+          <div style={{ padding: '0 24px 16px' }}>
+            <div style={{
+              background: 'var(--good-soft)', border: '1px solid oklch(88% 0.05 155)',
+              borderRadius: 12, padding: '10px 14px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+            }}>
+              <div style={{ fontSize: 13, color: 'var(--good)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <CheckIcon size={14} /> Editing existing profile
+              </div>
               <button
                 onClick={() => { setExistingUuid(null); setForm(EMPTY_FORM) }}
-                className="text-green-600 hover:text-green-800 text-xs underline"
+                style={{
+                  fontSize: 12, color: 'var(--good)', textDecoration: 'underline',
+                  textUnderlineOffset: 2, cursor: 'pointer',
+                }}
               >
-                {labels.createNewInstead}
+                Create new
               </button>
             </div>
-          )}
+          </div>
+        )}
 
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{ padding: '0 24px 48px' }}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+            <div style={{
+              padding: '10px 14px', background: 'var(--accent-soft)',
+              border: '1px solid oklch(85% 0.06 25)', borderRadius: 10,
+              marginBottom: 20, fontSize: 13, color: 'var(--accent-ink)',
+            }}>
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <section className="space-y-3">
-              <h2 className="text-xs font-semibold text-red-600 uppercase tracking-widest">
-                {labels.criticalInfo}
-              </h2>
-              <Field label={labels.fullName} name="name" value={form.name} onChange={handleChange} required placeholder={labels.phFullName} />
-              <Field label={labels.email} name="email" value={form.email} onChange={handleChange} placeholder={labels.phEmail} type="email" />
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{labels.bloodType}</label>
-                <select
-                  name="bloodType"
-                  value={form.bloodType}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 bg-white"
-                >
-                  <option value="">{labels.bloodUnknown}</option>
-                  {BLOOD_TYPES.map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
-              <Field
-                label={labels.allergies}
-                name="allergies"
-                value={form.allergies}
-                onChange={handleChange}
-                placeholder={labels.phAllergies}
-              />
-            </section>
+          <div style={{ marginBottom: 28 }}>
+            <SectionHeader num={1} title="Critical" desc="Shown first to responders." />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <Field label="Full name" name="name" value={form.name} onChange={handleChange}
+                placeholder="As it appears on your ID" required />
+              <Field label="Email" name="email" type="email" value={form.email} onChange={handleChange}
+                placeholder="you@email.com" hint="used to retrieve later" />
+              <BloodPicker value={form.bloodType} onChange={v => setForm(f => ({ ...f, bloodType: v }))} />
+              <Field label="Allergies" name="allergies" value={form.allergies} onChange={handleChange}
+                placeholder="Penicillin, peanuts, latex" />
+            </div>
+          </div>
 
-            <section className="space-y-3">
-              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
-                {labels.additionalDetails}
-              </h2>
-              <Field label={labels.conditions} name="conditions" value={form.conditions} onChange={handleChange} placeholder={labels.phConditions} />
-              <Field label={labels.medications} name="medications" value={form.medications} onChange={handleChange} placeholder={labels.phMedications} />
-              <div className="grid grid-cols-2 gap-3">
-                <Field label={labels.emergencyContact} name="emergencyContact" value={form.emergencyContact} onChange={handleChange} placeholder={labels.phEmergencyContact} />
-                <Field label={labels.emergencyPhone} name="emergencyPhone" value={form.emergencyPhone} onChange={handleChange} placeholder={labels.phEmergencyPhone} />
-              </div>
-            </section>
+          <div style={{ marginBottom: 28 }}>
+            <SectionHeader num={2} title="Medical" desc="Optional context for treatment." />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <Field label="Conditions" name="conditions" value={form.conditions} onChange={handleChange}
+                placeholder="Type 1 diabetes, asthma" />
+              <Field label="Current medications" name="medications" value={form.medications} onChange={handleChange}
+                placeholder="Insulin 10u, Albuterol PRN" />
+            </div>
+          </div>
 
-            <button
-              type="submit"
-              disabled={saving || !form.name.trim()}
-              className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors text-sm"
-            >
-              {saving ? labels.saving : existingUuid ? labels.update : labels.generate}
-            </button>
-          </form>
-        </div>
+          <div style={{ marginBottom: 28 }}>
+            <SectionHeader num={3} title="Emergency contact" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <Field label="Name" name="emergencyContact" value={form.emergencyContact}
+                onChange={handleChange} placeholder="Jane Doe" />
+              <Field label="Phone" name="emergencyPhone" value={form.emergencyPhone}
+                onChange={handleChange} placeholder="+1 555 000 0000" />
+            </div>
+          </div>
+
+          <Btn type="submit" disabled={saving || !form.name.trim()} icon={<ArrowRightIcon size={16} />}>
+            {saving ? 'Saving…' : existingUuid ? 'Update QR code' : 'Generate QR code'}
+          </Btn>
+          <p style={{
+            fontSize: 11, color: 'var(--ink-4)', textAlign: 'center', marginTop: 12,
+            display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'center',
+            fontFamily: 'var(--mono)', letterSpacing: '0.02em',
+          }}>
+            <LockIcon size={10} /> end-to-end encrypted · visible only on scan
+          </p>
+        </form>
+
       </div>
-    </div>
-  )
-}
-
-function Field({ label, name, value, onChange, placeholder = '', required = false, type = 'text' }) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
-      <input
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        required={required}
-        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 placeholder:text-gray-300"
-      />
     </div>
   )
 }

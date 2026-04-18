@@ -2,22 +2,16 @@ import { useRef, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import html2canvas from 'html2canvas'
 import { useTranslatedLabels } from '../lib/translate'
+import { Btn, DownloadIcon } from './ui'
 
-// Preview dimensions — exported at 6x = 1080x2340 (full phone resolution)
-const W = 180
-const H = 390
+const W = 220
+const H = 476
 
 const WALLPAPER_LABELS = {
-  medicalInfo: 'Medical Info',
-  bloodType: 'Blood Type',
-  allergies: 'Allergies',
-  conditions: 'Conditions',
-  medications: 'Medications',
-  emergency: 'Emergency',
-  scanHint: 'Scan for full info in your language',
+  scanHint: 'Scan for full profile in your language',
   preview: 'Lock screen wallpaper preview',
   exporting: 'Exporting…',
-  download: 'Download Wallpaper (1080×2340)',
+  download: 'Download PNG',
 }
 
 function buildOfflineQrValue(url, form) {
@@ -37,6 +31,10 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
   const labels = useTranslatedLabels(WALLPAPER_LABELS, lang)
   const offlineQrValue = buildOfflineQrValue(qrValue, form)
 
+  const dateStr = new Date().toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric',
+  })
+
   async function handleDownload() {
     setExporting(true)
     try {
@@ -54,83 +52,145 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
     }
   }
 
-  const labelStyle = { fontSize: 6, fontWeight: 700, color: '#9ca3af', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 1 }
-
   return (
-    <div className="space-y-3">
-      <p className="text-xs text-gray-400 text-center">{labels.preview}</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <p style={{
+        fontSize: 11, color: 'var(--ink-4)', textAlign: 'center',
+        fontFamily: 'var(--mono)', letterSpacing: '0.04em', margin: 0,
+      }}>
+        {labels.preview}
+      </p>
 
+      {/* Wallpaper preview */}
       <div
         ref={cardRef}
-        className="mx-auto overflow-hidden"
         style={{
-          width: W,
-          height: H,
-          background: 'linear-gradient(160deg, #0f0f0f 0%, #1a0000 100%)',
-          borderRadius: 16,
-          fontFamily: 'system-ui, sans-serif',
+          width: W, height: H, borderRadius: 24,
+          margin: '0 auto',
+          background: 'linear-gradient(180deg, oklch(22% 0.012 60) 0%, oklch(15% 0.012 60) 100%)',
+          position: 'relative', overflow: 'hidden',
+          boxShadow: '0 20px 40px -20px rgba(0,0,0,0.3)',
+          padding: '28px 18px 24px',
+          display: 'flex', flexDirection: 'column',
+          fontFamily: "'Inter Tight', system-ui, sans-serif",
+          color: 'white',
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', height: '100%', padding: 16 }}>
-          <div style={{ textAlign: 'center', marginTop: 12, width: '100%' }}>
-            <p style={{ fontSize: 7, fontWeight: 700, color: '#f87171', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6 }}>
-              ⚕ {labels.medicalInfo}
-            </p>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#ffffff', marginBottom: 6 }}>
-              {form.name || 'Your Name'}
-            </p>
-            {form.bloodType && (
-              <div style={{ marginBottom: 4 }}>
-                <p style={labelStyle}>{labels.bloodType}</p>
-                <p style={{ fontSize: 10, color: '#fca5a5' }}>{form.bloodType}</p>
+        {/* Mock clock */}
+        <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.95)' }}>
+          <div style={{
+            fontSize: 11, letterSpacing: '0.15em',
+            textTransform: 'uppercase', opacity: 0.65,
+          }}>
+            {dateStr}
+          </div>
+          <div style={{
+            fontSize: 64, fontWeight: 200,
+            letterSpacing: '-0.04em', lineHeight: 1, marginTop: 2,
+          }}>
+            9:41
+          </div>
+        </div>
+
+        {/* Medical badge */}
+        <div style={{
+          marginTop: 'auto',
+          background: 'rgba(255,255,255,0.08)',
+          border: '1px solid rgba(255,255,255,0.12)',
+          borderRadius: 16, padding: 14,
+        }}>
+          {/* Badge header */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            fontSize: 9,
+            fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+            letterSpacing: '0.1em', textTransform: 'uppercase',
+            color: 'oklch(60% 0.175 25)', marginBottom: 10,
+          }}>
+            <svg width="10" height="10" viewBox="0 0 20 20" fill="none">
+              <path d="M8 2h4v6h6v4h-6v6H8v-6H2V8h6V2z" fill="oklch(60% 0.175 25)" />
+            </svg>
+            Medical
+          </div>
+
+          <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em', marginBottom: 8 }}>
+            {form.name || 'Your name'}
+          </div>
+
+          <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+            <div>
+              <div style={{
+                fontSize: 8, opacity: 0.55, letterSpacing: '0.08em',
+                textTransform: 'uppercase', marginBottom: 2,
+              }}>
+                Blood
               </div>
-            )}
+              <div style={{
+                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                fontSize: 14, fontWeight: 500,
+              }}>
+                {form.bloodType || '—'}
+              </div>
+            </div>
             {form.allergies && (
-              <div style={{ background: 'rgba(239,68,68,0.15)', borderRadius: 4, padding: '3px 6px', marginBottom: 4 }}>
-                <p style={{ ...labelStyle, color: '#f87171' }}>⚠ {labels.allergies}</p>
-                <p style={{ fontSize: 9, color: '#fca5a5' }}>{form.allergies}</p>
-              </div>
-            )}
-            {form.conditions && (
-              <div style={{ marginBottom: 4 }}>
-                <p style={labelStyle}>{labels.conditions}</p>
-                <p style={{ fontSize: 9, color: '#d1d5db' }}>{form.conditions}</p>
-              </div>
-            )}
-            {form.medications && (
-              <div style={{ marginBottom: 2 }}>
-                <p style={labelStyle}>{labels.medications}</p>
-                <p style={{ fontSize: 9, color: '#9ca3af' }}>{form.medications}</p>
+              <div style={{ flex: 1 }}>
+                <div style={{
+                  fontSize: 8, opacity: 0.55, letterSpacing: '0.08em',
+                  textTransform: 'uppercase', color: 'oklch(78% 0.13 25)', marginBottom: 2,
+                }}>
+                  Allergies
+                </div>
+                <div style={{ fontSize: 11, color: 'oklch(85% 0.08 25)', lineHeight: 1.3 }}>
+                  {form.allergies}
+                </div>
               </div>
             )}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-            {form.emergencyContact && (
-              <div style={{ textAlign: 'center' }}>
-                <p style={labelStyle}>{labels.emergency}</p>
-                <p style={{ fontSize: 8, color: '#6b7280' }}>
-                  {form.emergencyContact}{form.emergencyPhone ? ` · ${form.emergencyPhone}` : ''}
-                </p>
-              </div>
-            )}
-            <div style={{ background: '#ffffff', padding: 4, borderRadius: 6 }}>
-              <QRCodeCanvas value={offlineQrValue} size={72} />
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.1)',
+          }}>
+            <div style={{
+              background: 'white', padding: 3, borderRadius: 4, flexShrink: 0,
+            }}>
+              <QRCodeCanvas value={offlineQrValue} size={54} />
             </div>
-            <p style={{ fontSize: 8, color: '#6b7280', textAlign: 'center' }}>
+            <div style={{ fontSize: 9, opacity: 0.65, lineHeight: 1.4 }}>
               {labels.scanHint}
-            </p>
+            </div>
           </div>
         </div>
       </div>
 
-      <button
-        onClick={handleDownload}
-        disabled={exporting}
-        className="w-full bg-gray-800 hover:bg-gray-900 disabled:opacity-50 text-white text-sm font-medium py-2 rounded-lg transition-colors"
-      >
-        {exporting ? labels.exporting : labels.download}
-      </button>
+      {/* Actions */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        <Btn variant="ghost" size="sm" disabled>Layout</Btn>
+        <Btn
+          size="sm"
+          icon={<DownloadIcon size={14} />}
+          onClick={handleDownload}
+          disabled={exporting}
+        >
+          {exporting ? labels.exporting : labels.download}
+        </Btn>
+      </div>
+
+      <div style={{
+        background: 'var(--paper-2)', border: '1px solid var(--line-2)',
+        borderRadius: 12, padding: 14,
+      }}>
+        <div style={{
+          fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--ink-3)',
+          letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8,
+        }}>
+          Tip
+        </div>
+        <p style={{ margin: 0, fontSize: 13, color: 'var(--ink-2)', lineHeight: 1.5 }}>
+          Set this as your <strong style={{ fontWeight: 600, color: 'var(--ink)' }}>lock screen</strong>,
+          not home screen — so it's visible without unlocking.
+        </p>
+      </div>
     </div>
   )
 }
