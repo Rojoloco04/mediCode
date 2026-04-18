@@ -21,17 +21,25 @@ const UI_LABELS = {
   medications: 'Medications',
   emergencyContact: 'Emergency contact',
   profileNotFound: 'Profile not found',
+  exit: 'Exit',
+  updatedJustNow: 'Updated just now',
+  updatedMinutesAgo: 'Updated {n}m ago',
+  updatedHoursAgo: 'Updated {n}h ago',
+  updatedDaysAgo: 'Updated {n}d ago',
+  profileId: 'Profile ID',
+  accessLogged: 'Access logged',
+  responderSession: 'Responder session',
 }
 const DEMO_RESPONDER_IDS = new Set(['FR-001', 'FR-002', 'FR-999'])
 
-function relativeTime(iso) {
+function relativeTime(iso, labels) {
   if (!iso) return null
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
-  if (diff < 60) return 'Updated just now'
-  if (diff < 3600) return `Updated ${Math.floor(diff / 60)}m ago`
-  if (diff < 86400) return `Updated ${Math.floor(diff / 3600)}h ago`
-  const days = Math.floor(diff / 86400)
-  return `Updated ${days} day${days > 1 ? 's' : ''} ago`
+  const L = labels ?? {}
+  if (diff < 60) return L.updatedJustNow ?? 'Updated just now'
+  if (diff < 3600) return (L.updatedMinutesAgo ?? 'Updated {n}m ago').replace('{n}', Math.floor(diff / 60))
+  if (diff < 86400) return (L.updatedHoursAgo ?? 'Updated {n}h ago').replace('{n}', Math.floor(diff / 3600))
+  return (L.updatedDaysAgo ?? 'Updated {n}d ago').replace('{n}', Math.floor(diff / 86400))
 }
 
 function AuthGate({ onAuthorized }) {
@@ -332,7 +340,7 @@ export default function InfoPage() {
           onClick={() => setStep('auth')}
           style={{ fontSize: 12, color: 'var(--ink-3)', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
         >
-          <ArrowLeftIcon size={12} /> Exit
+          <ArrowLeftIcon size={12} /> {uiLabels.exit}
         </button>
         <BrandMark size={16} />
         <LangPill code={lang} label={langObj.label} onClick={() => setStep('language')} />
@@ -358,7 +366,7 @@ export default function InfoPage() {
                   fontSize: 11, color: 'rgba(255,255,255,0.5)',
                   fontFamily: 'var(--mono)', letterSpacing: '0.02em', marginTop: 4,
                 }}>
-                  {relativeTime(displayed.updatedAt)}
+                  {relativeTime(displayed.updatedAt, uiLabels)}
                 </div>
               )}
             </div>
@@ -522,9 +530,9 @@ export default function InfoPage() {
           fontSize: 10, color: 'var(--ink-4)', fontFamily: 'var(--mono)',
           letterSpacing: '0.02em', textAlign: 'center', lineHeight: 1.7,
         }}>
-          Profile ID · {uuid?.slice(0, 8)}
+          {uiLabels.profileId} · {uuid?.slice(0, 8)}
           <br />
-          <span style={{ opacity: 0.7 }}>Access logged · Responder session</span>
+          <span style={{ opacity: 0.7 }}>{uiLabels.accessLogged} · {uiLabels.responderSession}</span>
         </div>
 
       </div>

@@ -26,6 +26,8 @@ const QR_LABELS = {
   fieldUnknown: 'Unknown',
   wallpaperTitle: 'Lock-screen wallpaper',
   wallpaperDesc: 'Exports at 1080×2340 — fits any modern phone.',
+  profileSuffix: "'s profile",
+  yourProfile: 'your profile',
 }
 
 export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onLangChange, onBack }) {
@@ -138,9 +140,9 @@ export default function QRDisplay({ uuid, form, lang = 'en', languages = [], onL
             }}>
               {labels.scanned}{' '}
               {form.name
-                ? <><strong style={{ color: 'var(--ink-2)', fontWeight: 500 }}>{form.name}</strong>'s</>
-                : 'your'
-              } profile.
+                ? <><strong style={{ color: 'var(--ink-2)', fontWeight: 500 }}>{form.name}</strong>{labels.profileSuffix}</>
+                : labels.yourProfile
+              }.
             </p>
           </div>
         </div>
