@@ -174,7 +174,7 @@ export default function InfoPage() {
             <p className="text-lg font-bold text-gray-900">{displayed.name}</p>
           </div>
           {displayed.bloodType ? (
-            <div className="bg-red-600 text-white text-lg font-bold rounded-xl w-14 h-14 flex items-center justify-center shadow">
+            <div className="bg-red-600 text-white text-base font-bold rounded-xl w-16 h-16 flex items-center justify-center shadow">
               {displayed.bloodType}
             </div>
           ) : (

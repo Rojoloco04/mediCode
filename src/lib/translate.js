@@ -10,7 +10,15 @@ export async function fetchLanguages() {
   if (!res.ok) throw new Error(`Failed to fetch languages: ${res.status}`)
   const json = await res.json()
   if (!Array.isArray(json.languages)) throw new Error('Unexpected languages response shape')
-  return json.languages.map((l) => ({ code: l.language, label: l.name }))
+  return json.languages.map((l) => {
+    let label = l.name
+    try {
+      const dn = new Intl.DisplayNames([l.language], { type: 'language' })
+      const native = dn.of(l.language)
+      if (native) label = native
+    } catch {}
+    return { code: l.language, label }
+  })
 }
 
 export async function translateText(text, targetLang) {
