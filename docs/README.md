@@ -13,12 +13,10 @@ A medical profile app that generates a scannable QR code containing your critica
 ## Tech stack
 
 - **React 18 + Vite** — frontend
-- **Tailwind CSS** — styling
 - **Supabase** — database (profiles stored by UUID)
 - **Vercel** — hosting + serverless API routes
 - **Google Translate API** — field translation (30+ languages)
 - **ElevenLabs TTS** — AI voice alert generation
-- **PWA** — offline-capable via service worker
 
 ## Getting started
 
