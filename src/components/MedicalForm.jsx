@@ -18,6 +18,7 @@ export default function MedicalForm() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [uuid, setUuid] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
 
   function handleChange(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
@@ -26,21 +27,22 @@ export default function MedicalForm() {
   async function handleSubmit(e) {
     e.preventDefault()
     setSaving(true)
+    setError(null)
     const { data, error } = await supabase
       .from('profiles')
       .insert({
         name: form.name,
-        blood_type: form.bloodType,
-        allergies: form.allergies,
-        conditions: form.conditions,
-        medications: form.medications,
-        emergency_contact: form.emergencyContact,
-        emergency_phone: form.emergencyPhone,
+        blood_type: form.bloodType || null,
+        allergies: form.allergies || null,
+        conditions: form.conditions || null,
+        medications: form.medications || null,
+        emergency_contact: form.emergencyContact || null,
+        emergency_phone: form.emergencyPhone || null,
       })
       .select('id')
       .single()
     if (error) {
-      alert('Failed to save: ' + error.message)
+      setError('Could not save your profile. Please try again.')
       setSaving(false)
       return
     }
@@ -53,48 +55,78 @@ export default function MedicalForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-md w-full max-w-lg p-8">
-        <h1 className="text-2xl font-bold text-red-600 mb-1">QR-Aid</h1>
-        <p className="text-sm text-gray-500 mb-6">
-          Your medical profile, scannable in any language.
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-gray-100 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg overflow-hidden">
+        {/* Header */}
+        <div className="bg-red-600 px-8 py-6">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-white text-2xl">⚕</span>
+            <h1 className="text-2xl font-bold text-white">QR-Aid</h1>
+          </div>
+          <p className="text-red-100 text-sm">
+            Your medical profile, scannable in any language.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Field label="Full Name" name="name" value={form.name} onChange={handleChange} required />
+        <div className="px-8 py-6 space-y-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+              {error}
+            </div>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Blood Type</label>
-            <select
-              name="bloodType"
-              value={form.bloodType}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Critical section */}
+            <section className="space-y-3">
+              <h2 className="text-xs font-semibold text-red-600 uppercase tracking-widest">
+                Critical Information
+              </h2>
+              <Field label="Full Name" name="name" value={form.name} onChange={handleChange} required placeholder="As it appears on your ID" />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Blood Type</label>
+                <select
+                  name="bloodType"
+                  value={form.bloodType}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 bg-white"
+                >
+                  <option value="">Unknown</option>
+                  {BLOOD_TYPES.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+              <Field
+                label="Allergies"
+                name="allergies"
+                value={form.allergies}
+                onChange={handleChange}
+                placeholder="e.g. Penicillin, peanuts, latex"
+              />
+            </section>
+
+            {/* Additional section */}
+            <section className="space-y-3">
+              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
+                Additional Details
+              </h2>
+              <Field label="Medical Conditions" name="conditions" value={form.conditions} onChange={handleChange} placeholder="e.g. Type 1 Diabetes, Asthma" />
+              <Field label="Current Medications" name="medications" value={form.medications} onChange={handleChange} placeholder="e.g. Insulin 10u, Albuterol PRN" />
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Emergency Contact" name="emergencyContact" value={form.emergencyContact} onChange={handleChange} placeholder="Jane Doe" />
+                <Field label="Their Phone" name="emergencyPhone" value={form.emergencyPhone} onChange={handleChange} placeholder="+1 555 000 0000" />
+              </div>
+            </section>
+
+            <button
+              type="submit"
+              disabled={saving || !form.name.trim()}
+              className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors text-sm"
             >
-              <option value="">Unknown</option>
-              {BLOOD_TYPES.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
-          </div>
-
-          <Field label="Allergies" name="allergies" value={form.allergies} onChange={handleChange} placeholder="e.g. Penicillin, peanuts" />
-          <Field label="Medical Conditions" name="conditions" value={form.conditions} onChange={handleChange} placeholder="e.g. Type 1 Diabetes, Asthma" />
-          <Field label="Current Medications" name="medications" value={form.medications} onChange={handleChange} placeholder="e.g. Insulin, Albuterol" />
-
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Emergency Contact" name="emergencyContact" value={form.emergencyContact} onChange={handleChange} placeholder="Jane Doe" />
-            <Field label="Their Phone" name="emergencyPhone" value={form.emergencyPhone} onChange={handleChange} placeholder="+1 555 000 0000" />
-          </div>
-
-          <button
-            type="submit"
-            disabled={saving || !form.name}
-            className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition-colors"
-          >
-            {saving ? 'Saving…' : 'Generate QR Code'}
-          </button>
-        </form>
+              {saving ? 'Saving…' : 'Generate My QR Code →'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   )
@@ -103,7 +135,10 @@ export default function MedicalForm() {
 function Field({ label, name, value, onChange, placeholder = '', required = false }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
       <input
         type="text"
         name={name}
@@ -111,7 +146,7 @@ function Field({ label, name, value, onChange, placeholder = '', required = fals
         onChange={onChange}
         placeholder={placeholder}
         required={required}
-        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 placeholder:text-gray-300"
       />
     </div>
   )
