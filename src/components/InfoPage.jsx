@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { translateFields, fetchLanguages, getLocationLanguage } from '../lib/translate'
+import { translateFields, fetchLanguages, getLocationLanguage, useTranslatedLabels } from '../lib/translate'
 import { generateAlertAudio } from '../lib/elevenlabs'
 import {
   BrandMark, Chip, Btn, LangPill, LanguageGate,
@@ -11,6 +11,17 @@ import {
 
 const TRANSLATABLE = ['allergies', 'conditions', 'medications']
 const ALERT_TEXT_EN = 'This person has been involved in a medical emergency.'
+
+const UI_LABELS = {
+  patient: 'Patient',
+  bloodUnknown: 'Blood unknown',
+  allergies: 'Allergies',
+  voiceAlert: 'Voice alert',
+  conditions: 'Conditions',
+  medications: 'Medications',
+  emergencyContact: 'Emergency contact',
+  profileNotFound: 'Profile not found',
+}
 const DEMO_RESPONDER_IDS = new Set(['FR-001', 'FR-002', 'FR-999'])
 
 function relativeTime(iso) {
@@ -161,6 +172,7 @@ export default function InfoPage() {
   const [audioError, setAudioError] = useState(null)
   const [alertPlaying, setAlertPlaying] = useState(false)
   const audioRef = useRef(null)
+  const uiLabels = useTranslatedLabels(UI_LABELS, lang)
 
   useEffect(() => {
     fetchLanguages()
@@ -290,7 +302,7 @@ export default function InfoPage() {
             fontSize: 32, fontWeight: 600, letterSpacing: '-0.03em',
             color: 'var(--ink)', marginBottom: 8,
           }}>
-            Profile not found
+            {uiLabels.profileNotFound}
           </p>
           <p style={{ fontSize: 14, color: 'var(--ink-3)', lineHeight: 1.5, marginBottom: 24 }}>
             This QR code may be invalid or the profile has been removed.
@@ -333,7 +345,7 @@ export default function InfoPage() {
             fontSize: 10, fontFamily: 'var(--mono)', letterSpacing: '0.1em',
             textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: 4,
           }}>
-            Patient
+            {uiLabels.patient}
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
             <div>
@@ -364,7 +376,7 @@ export default function InfoPage() {
                 borderRadius: 8, fontSize: 10, color: 'rgba(255,255,255,0.5)',
                 fontFamily: 'var(--mono)', letterSpacing: '0.04em', flexShrink: 0,
               }}>
-                BLOOD UNKNOWN
+                {uiLabels.bloodUnknown.toUpperCase()}
               </div>
             )}
           </div>
@@ -382,7 +394,7 @@ export default function InfoPage() {
               fontSize: 10, color: 'var(--accent-ink)', fontFamily: 'var(--mono)',
               letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, fontWeight: 600,
             }}>
-              <AlertIcon size={11} /> Allergies
+              <AlertIcon size={11} /> {uiLabels.allergies}
             </div>
             <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--accent-ink)', letterSpacing: '-0.01em', lineHeight: 1.3 }}>
               {displayed.allergies}
@@ -398,7 +410,7 @@ export default function InfoPage() {
                 fontSize: 10, color: 'var(--ink-3)', fontFamily: 'var(--mono)',
                 letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 500,
               }}>
-                Voice alert · {langObj.label}
+                {uiLabels.voiceAlert} · {langObj.label}
               </div>
               <Chip tone="neutral">AI</Chip>
             </div>
@@ -477,7 +489,7 @@ export default function InfoPage() {
                   fontSize: 10, fontFamily: 'var(--mono)', color: 'rgba(255,255,255,0.5)',
                   letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2,
                 }}>
-                  Emergency contact
+                  {uiLabels.emergencyContact}
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 500, letterSpacing: '-0.01em' }}>
                   {displayed.emergencyContact || 'Contact'}{' '}
@@ -491,8 +503,8 @@ export default function InfoPage() {
           </a>
         )}
 
-        {displayed.conditions && <InfoRow label="Conditions" value={displayed.conditions} />}
-        {displayed.medications && <InfoRow label="Medications" value={displayed.medications} />}
+        {displayed.conditions && <InfoRow label={uiLabels.conditions} value={displayed.conditions} />}
+        {displayed.medications && <InfoRow label={uiLabels.medications} value={displayed.medications} />}
 
         {translating && (
           <p style={{
