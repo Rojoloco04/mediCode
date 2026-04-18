@@ -129,13 +129,37 @@ export default function MedicalForm() {
       }
       setUuid(existingUuid)
     } else {
-      const { data, error } = await supabase.from('profiles').insert(fields).select('id').single()
-      if (error) {
-        setError('Could not save your profile. Please try again.')
-        setSaving(false)
-        return
+      const email = form.email.trim().toLowerCase()
+      let resolvedUuid = null
+
+      if (email) {
+        const { data: existing } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .single()
+        if (existing) {
+          const { error } = await supabase.from('profiles').update(fields).eq('id', existing.id)
+          if (error) {
+            setError('Could not update your profile. Please try again.')
+            setSaving(false)
+            return
+          }
+          resolvedUuid = existing.id
+        }
       }
-      setUuid(data.id)
+
+      if (!resolvedUuid) {
+        const { data, error } = await supabase.from('profiles').insert(fields).select('id').single()
+        if (error) {
+          setError('Could not save your profile. Please try again.')
+          setSaving(false)
+          return
+        }
+        resolvedUuid = data.id
+      }
+
+      setUuid(resolvedUuid)
     }
     setSaving(false)
   }
