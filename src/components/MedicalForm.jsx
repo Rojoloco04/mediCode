@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import QRDisplay from './QRDisplay'
+import { supabase } from '../lib/supabase'
 
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 
@@ -25,9 +26,25 @@ export default function MedicalForm() {
   async function handleSubmit(e) {
     e.preventDefault()
     setSaving(true)
-    // TODO Hour 2: save to Supabase, get back uuid
-    const fakeUuid = crypto.randomUUID()
-    setUuid(fakeUuid)
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert({
+        name: form.name,
+        blood_type: form.bloodType,
+        allergies: form.allergies,
+        conditions: form.conditions,
+        medications: form.medications,
+        emergency_contact: form.emergencyContact,
+        emergency_phone: form.emergencyPhone,
+      })
+      .select('id')
+      .single()
+    if (error) {
+      alert('Failed to save: ' + error.message)
+      setSaving(false)
+      return
+    }
+    setUuid(data.id)
     setSaving(false)
   }
 

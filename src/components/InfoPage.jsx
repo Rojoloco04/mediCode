@@ -1,44 +1,75 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+import { translateFields } from '../lib/translate'
 
-// TODO Hour 3: wire up translation
 const LANGUAGES = [
   { code: 'en', label: 'English' },
   { code: 'es', label: 'Español' },
   { code: 'fr', label: 'Français' },
   { code: 'ja', label: '日本語' },
   { code: 'de', label: 'Deutsch' },
+  { code: 'zh', label: '中文' },
+  { code: 'ar', label: 'العربية' },
+  { code: 'pt', label: 'Português' },
 ]
+
+// Fields that make sense to translate (not name/phone)
+const TRANSLATABLE = ['allergies', 'conditions', 'medications']
 
 export default function InfoPage() {
   const { uuid } = useParams()
-  const [data, setData] = useState(null)
+  const [raw, setRaw] = useState(null)
+  const [displayed, setDisplayed] = useState(null)
   const [lang, setLang] = useState('en')
+  const [translating, setTranslating] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
-      // TODO Hour 2: fetch from Supabase by uuid
-      // Stub so the page renders during dev
-      setData({
-        name: 'Jane Doe',
-        bloodType: 'O+',
-        allergies: 'Penicillin',
-        conditions: 'Type 1 Diabetes',
-        medications: 'Insulin',
-        emergencyContact: 'John Doe',
-        emergencyPhone: '+1 555 000 0000',
-      })
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', uuid)
+        .single()
+      if (!error && data) {
+        const profile = {
+          name: data.name,
+          bloodType: data.blood_type,
+          allergies: data.allergies,
+          conditions: data.conditions,
+          medications: data.medications,
+          emergencyContact: data.emergency_contact,
+          emergencyPhone: data.emergency_phone,
+        }
+        setRaw(profile)
+        setDisplayed(profile)
+      }
       setLoading(false)
     }
     load()
   }, [uuid])
 
+  useEffect(() => {
+    if (!raw) return
+    if (lang === 'en') {
+      setDisplayed(raw)
+      return
+    }
+    setTranslating(true)
+    const toTranslate = Object.fromEntries(
+      TRANSLATABLE.filter((k) => raw[k]).map((k) => [k, raw[k]])
+    )
+    translateFields(toTranslate, lang)
+      .then((translated) => setDisplayed({ ...raw, ...translated }))
+      .finally(() => setTranslating(false))
+  }, [lang, raw])
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center text-gray-500">Loading…</div>
   }
 
-  if (!data) {
+  if (!displayed) {
     return <div className="min-h-screen flex items-center justify-center text-gray-500">Profile not found.</div>
   }
 
@@ -58,13 +89,17 @@ export default function InfoPage() {
           </select>
         </div>
 
+        {translating && (
+          <p className="text-xs text-center text-gray-400 animate-pulse">Translating…</p>
+        )}
+
         <div className="space-y-3">
-          <Row label="Name" value={data.name} />
-          <Row label="Blood Type" value={data.bloodType} highlight />
-          <Row label="Allergies" value={data.allergies} highlight />
-          <Row label="Conditions" value={data.conditions} />
-          <Row label="Medications" value={data.medications} />
-          <Row label="Emergency Contact" value={`${data.emergencyContact} — ${data.emergencyPhone}`} />
+          <Row label="Name" value={displayed.name} />
+          <Row label="Blood Type" value={displayed.bloodType} highlight />
+          <Row label="Allergies" value={displayed.allergies} highlight />
+          <Row label="Conditions" value={displayed.conditions} />
+          <Row label="Medications" value={displayed.medications} />
+          <Row label="Emergency Contact" value={`${displayed.emergencyContact} — ${displayed.emergencyPhone}`} />
         </div>
       </div>
     </div>
