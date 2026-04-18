@@ -7,15 +7,18 @@ A medical profile app that generates a scannable QR code containing your critica
 1. Fill out a form with your name, blood type, allergies, conditions, medications, and emergency contact.
 2. Get a unique QR code (and shareable link) tied to your profile.
 3. Anyone who scans the QR code can view your medical info, auto-translated into their local language via AI.
-4. Return to the site with your email to update your profile anytime.
+4. An AI-generated voice alert reads the critical information aloud in the responder's language.
+5. Return to the site with your email to update your profile anytime.
 
 ## Tech stack
 
-- **React + Vite** — frontend
+- **React 18 + Vite** — frontend
 - **Tailwind CSS** — styling
 - **Supabase** — database (profiles stored by UUID)
 - **Vercel** — hosting + serverless API routes
-- **ElevenLabs / translation API** — language detection and label translation
+- **Google Translate API** — field translation (30+ languages)
+- **ElevenLabs TTS** — AI voice alert generation
+- **PWA** — offline-capable via service worker
 
 ## Getting started
 
@@ -24,7 +27,14 @@ npm install
 npm run dev
 ```
 
-Create a `.env.local` with your Supabase and API keys (see `.env.local` in the project root for the required variables).
+Create a `.env.local` with your API keys:
+
+```
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+ELEVENLABS_API_KEY=
+GOOGLE_TRANSLATE_API_KEY=
+```
 
 ## Routes
 
@@ -32,6 +42,25 @@ Create a `.env.local` with your Supabase and API keys (see `.env.local` in the p
 |------|-------------|
 | `/` | Create or update a medical profile |
 | `/:uuid` | View a profile (shareable, used by QR code) |
+
+## Key features
+
+**Profile creation**
+- Blood type picker, allergy/condition/medication fields
+- Email-based lookup to retrieve and update existing profiles
+- Language selector (30+ languages) with search
+
+**QR & sharing**
+- SVG QR code generation linked to the profile UUID
+- Lock-screen wallpaper export (1080×2340 PNG) for easy responder access
+- Native share API with clipboard fallback
+
+**Responder view**
+- Language auto-detected from browser locale or geolocation (OpenStreetMap reverse geocoding)
+- All medical fields auto-translated into the responder's language
+- AI voice alert played in the responder's language via ElevenLabs TTS
+- Audio waveform visualization + playback controls
+- Emergency contact quick-call button
 
 ## Project structure
 
@@ -46,7 +75,7 @@ src/
     supabase.js       # Supabase client
     translate.js      # Language detection + label translation
 api/
-  elevenlabs.js       # Serverless proxy for ElevenLabs
-  translate.js        # Serverless proxy for translation
+  elevenlabs.js       # Serverless proxy for ElevenLabs TTS
+  translate.js        # Serverless proxy for Google Translate
   languages.js        # Language list endpoint
 ```
