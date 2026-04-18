@@ -284,24 +284,32 @@ export default function InfoPage() {
                 </div>
               )}
             </div>
-            {displayed.bloodType ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0, gap: 4 }}>
               <div style={{
-                padding: '8px 14px',
-                background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: 10, fontFamily: 'var(--mono)', fontSize: 20, fontWeight: 500,
-                letterSpacing: '-0.02em', flexShrink: 0,
+                fontSize: 9, fontFamily: 'var(--mono)', letterSpacing: '0.1em',
+                textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)',
               }}>
-                {displayed.bloodType}
+                {uiLabels.bloodType}
               </div>
-            ) : (
-              <div style={{
-                padding: '6px 10px', background: 'rgba(255,255,255,0.06)',
-                borderRadius: 8, fontSize: 10, color: 'rgba(255,255,255,0.5)',
-                fontFamily: 'var(--mono)', letterSpacing: '0.04em', flexShrink: 0,
-              }}>
-                {uiLabels.bloodUnknown.toUpperCase()}
-              </div>
-            )}
+              {displayed.bloodType ? (
+                <div style={{
+                  padding: '8px 14px',
+                  background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 10, fontFamily: 'var(--mono)', fontSize: 20, fontWeight: 500,
+                  letterSpacing: '-0.02em',
+                }}>
+                  {displayed.bloodType}
+                </div>
+              ) : (
+                <div style={{
+                  padding: '6px 10px', background: 'rgba(255,255,255,0.06)',
+                  borderRadius: 8, fontSize: 10, color: 'rgba(255,255,255,0.5)',
+                  fontFamily: 'var(--mono)', letterSpacing: '0.04em',
+                }}>
+                  {uiLabels.bloodUnknown.toUpperCase()}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -386,7 +394,10 @@ export default function InfoPage() {
             <audio
               ref={audioRef}
               src={alertAudioUrl}
-              onEnded={() => setAlertPlaying(false)}
+              onEnded={() => { setAlertPlaying(false); setAudioProgress(0) }}
+              onTimeUpdate={() => {
+                if (audioRef.current) setAudioProgress(audioRef.current.currentTime / (audioRef.current.duration || 1))
+              }}
               style={{ display: 'none' }}
             />
           )}
