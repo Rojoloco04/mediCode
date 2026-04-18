@@ -12,16 +12,25 @@ const WALLPAPER_LABELS = {
   preview: 'Lock screen wallpaper preview',
   exporting: 'Exporting…',
   download: 'Download PNG',
+  badgeTitle: 'Medical',
+  namePlaceholder: 'Your name',
+  blood: 'Blood',
+  allergies: 'Allergies',
+  conditions: 'Conditions',
+  medications: 'Meds',
+  emergency: 'Emergency',
+  tipHeading: 'Tip',
+  tipBody: "Set this as your lock screen, not home screen — so it's visible without unlocking.",
 }
 
-function buildOfflineQrValue(url, form) {
+function buildOfflineQrValue(url, form, labels) {
   const lines = [url, '']
-  if (form.bloodType) lines.push(`Blood: ${form.bloodType}`)
-  if (form.allergies) lines.push(`Allergies: ${form.allergies}`)
-  if (form.conditions) lines.push(`Conditions: ${form.conditions}`)
-  if (form.medications) lines.push(`Meds: ${form.medications}`)
+  if (form.bloodType) lines.push(`${labels.blood}: ${form.bloodType}`)
+  if (form.allergies) lines.push(`${labels.allergies}: ${form.allergies}`)
+  if (form.conditions) lines.push(`${labels.conditions}: ${form.conditions}`)
+  if (form.medications) lines.push(`${labels.medications}: ${form.medications}`)
   const contact = [form.emergencyContact, form.emergencyPhone].filter(Boolean).join(' ')
-  if (contact) lines.push(`Emergency: ${contact}`)
+  if (contact) lines.push(`${labels.emergency}: ${contact}`)
   return lines.join('\n')
 }
 
@@ -29,7 +38,7 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
   const cardRef = useRef(null)
   const [exporting, setExporting] = useState(false)
   const labels = useTranslatedLabels(WALLPAPER_LABELS, lang)
-  const offlineQrValue = buildOfflineQrValue(qrValue, form)
+  const offlineQrValue = buildOfflineQrValue(qrValue, form, labels)
 
   const dateStr = new Date().toLocaleDateString('en-US', {
     weekday: 'short', month: 'short', day: 'numeric',
@@ -110,11 +119,11 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
             <svg width="10" height="10" viewBox="0 0 20 20" fill="none">
               <path d="M8 2h4v6h6v4h-6v6H8v-6H2V8h6V2z" fill="oklch(60% 0.175 25)" />
             </svg>
-            Medical
+            {labels.badgeTitle}
           </div>
 
           <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em', marginBottom: 8 }}>
-            {form.name || 'Your name'}
+            {form.name || labels.namePlaceholder}
           </div>
 
           <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
@@ -123,7 +132,7 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
                 fontSize: 8, opacity: 0.55, letterSpacing: '0.08em',
                 textTransform: 'uppercase', marginBottom: 2,
               }}>
-                Blood
+                {labels.blood}
               </div>
               <div style={{
                 fontFamily: "'JetBrains Mono', ui-monospace, monospace",
@@ -138,7 +147,7 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
                   fontSize: 8, opacity: 0.55, letterSpacing: '0.08em',
                   textTransform: 'uppercase', color: 'oklch(78% 0.13 25)', marginBottom: 2,
                 }}>
-                  Allergies
+                  {labels.allergies}
                 </div>
                 <div style={{ fontSize: 11, color: 'oklch(85% 0.08 25)', lineHeight: 1.3 }}>
                   {form.allergies}
@@ -184,11 +193,10 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
           fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--ink-3)',
           letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8,
         }}>
-          Tip
+          {labels.tipHeading}
         </div>
         <p style={{ margin: 0, fontSize: 13, color: 'var(--ink-2)', lineHeight: 1.5 }}>
-          Set this as your <strong style={{ fontWeight: 600, color: 'var(--ink)' }}>lock screen</strong>,
-          not home screen — so it's visible without unlocking.
+          {labels.tipBody}
         </p>
       </div>
     </div>
