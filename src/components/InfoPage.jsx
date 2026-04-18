@@ -5,8 +5,8 @@ import { translateFields, fetchLanguages, getLocationLanguage, useTranslatedLabe
 import { generateAlertAudio } from '../lib/elevenlabs'
 import {
   BrandMark, Chip, Btn, LangPill, LanguageGate,
-  ShieldIcon, CheckIcon, AlertIcon, PhoneIcon,
-  ArrowRightIcon, ArrowLeftIcon, PlayIcon, PauseIcon, LockIcon,
+  CheckIcon, AlertIcon, PhoneIcon,
+  ArrowRightIcon, ArrowLeftIcon, PlayIcon, PauseIcon,
 } from './ui'
 
 const TRANSLATABLE = ['allergies', 'conditions', 'medications']
@@ -26,11 +26,7 @@ const UI_LABELS = {
   updatedMinutesAgo: 'Updated {n}m ago',
   updatedHoursAgo: 'Updated {n}h ago',
   updatedDaysAgo: 'Updated {n}d ago',
-  profileId: 'Profile ID',
-  accessLogged: 'Access logged',
-  responderSession: 'Responder session',
 }
-const DEMO_RESPONDER_IDS = new Set(['FR-001', 'FR-002', 'FR-999'])
 
 function relativeTime(iso, labels) {
   if (!iso) return null
@@ -42,85 +38,6 @@ function relativeTime(iso, labels) {
   return (L.updatedDaysAgo ?? 'Updated {n}d ago').replace('{n}', Math.floor(diff / 86400))
 }
 
-function AuthGate({ onAuthorized }) {
-  const [input, setInput] = useState('')
-  const [error, setError] = useState(false)
-
-  function handle(e) {
-    e.preventDefault()
-    if (DEMO_RESPONDER_IDS.has(input.trim().toUpperCase())) onAuthorized()
-    else setError(true)
-  }
-
-  return (
-    <div style={{ minHeight: '100dvh', background: 'var(--paper)', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ maxWidth: 480, margin: '0 auto', width: '100%', padding: '16px 24px', borderBottom: '1px solid var(--line-2)' }}>
-        <BrandMark />
-      </div>
-      <div style={{
-        flex: 1, maxWidth: 480, margin: '0 auto', width: '100%',
-        padding: '28px 24px', display: 'flex', flexDirection: 'column',
-      }}>
-        <Chip tone="accent"><ShieldIcon size={10} /> Restricted</Chip>
-        <h1 style={{
-          marginTop: 16, marginBottom: 8, fontSize: 24, fontWeight: 600,
-          letterSpacing: '-0.025em', lineHeight: 1.15, color: 'var(--ink)',
-        }}>
-          Responder verification
-        </h1>
-        <p style={{ margin: 0, fontSize: 14, color: 'var(--ink-3)', lineHeight: 1.5 }}>
-          Enter your first-responder ID. Every access is logged.
-        </p>
-
-        <form onSubmit={handle} style={{ marginTop: 24 }}>
-          <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--ink-2)', display: 'block', marginBottom: 8 }}>
-            Responder ID
-          </label>
-          <input
-            autoFocus
-            value={input}
-            onChange={e => { setInput(e.target.value); setError(false) }}
-            placeholder="FR-001"
-            style={{
-              width: '100%', padding: '14px 16px', borderRadius: 12,
-              border: `1px solid ${error ? 'var(--accent)' : 'var(--line)'}`,
-              background: 'var(--paper-2)',
-              fontFamily: 'var(--mono)', fontSize: 18,
-              letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--ink)',
-            }}
-          />
-          {error ? (
-            <p style={{ margin: '8px 0 0', fontSize: 12, color: 'var(--accent)' }}>
-              Invalid ID. Access denied.
-            </p>
-          ) : (
-            <p style={{
-              margin: '8px 0 0', fontSize: 11, color: 'var(--ink-4)',
-              fontFamily: 'var(--mono)', letterSpacing: '0.02em',
-            }}>
-              demo: FR-001 · FR-002 · FR-999
-            </p>
-          )}
-          <div style={{ marginTop: 20 }}>
-            <Btn type="submit" disabled={!input.trim()} icon={<ArrowRightIcon size={16} />}>
-              Verify & access
-            </Btn>
-          </div>
-        </form>
-
-        <div style={{
-          marginTop: 'auto', paddingTop: 16, borderTop: '1px solid var(--line-2)',
-          fontSize: 11, color: 'var(--ink-4)', fontFamily: 'var(--mono)',
-          letterSpacing: '0.02em', textAlign: 'center',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-        }}>
-          <LockIcon size={10} />
-          access audit · {new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toLowerCase()}
-        </div>
-      </div>
-    </div>
-  )
-}
 
 function WaveForm({ playing }) {
   const bars = 32
@@ -163,7 +80,6 @@ function InfoRow({ label, value }) {
 export default function InfoPage() {
   const { uuid } = useParams()
   const [step, setStep] = useState('language')
-  const [authorized, setAuthorized] = useState(false)
   const [lang, setLang] = useState(() => {
     if (typeof navigator === 'undefined') return 'en'
     return navigator.language?.split('-')[0]?.toLowerCase() || 'en'
@@ -270,15 +186,11 @@ export default function InfoPage() {
       <LanguageGate
         lang={lang} setLang={setLang}
         languages={languages}
-        onContinue={() => setStep(authorized ? 'main' : 'auth')}
+        onContinue={() => setStep('main')}
         geoAutoDetected={geoAutoDetected}
         subtitle="Select the language you want to view this profile in."
       />
     )
-  }
-
-  if (step === 'auth') {
-    return <AuthGate onAuthorized={() => { setAuthorized(true); setStep('main') }} />
   }
 
   if (loading) {
@@ -337,7 +249,7 @@ export default function InfoPage() {
         position: 'sticky', top: 0, background: 'var(--paper)', zIndex: 10,
       }}>
         <button
-          onClick={() => setStep('auth')}
+          onClick={() => setStep('language')}
           style={{ fontSize: 12, color: 'var(--ink-3)', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
         >
           <ArrowLeftIcon size={12} /> {uiLabels.exit}
@@ -523,17 +435,6 @@ export default function InfoPage() {
             Translating…
           </p>
         )}
-
-        {/* Footer */}
-        <div style={{
-          marginTop: 8, paddingTop: 14, borderTop: '1px solid var(--line-2)',
-          fontSize: 10, color: 'var(--ink-4)', fontFamily: 'var(--mono)',
-          letterSpacing: '0.02em', textAlign: 'center', lineHeight: 1.7,
-        }}>
-          {uiLabels.profileId} · {uuid?.slice(0, 8)}
-          <br />
-          <span style={{ opacity: 0.7 }}>{uiLabels.accessLogged} · {uiLabels.responderSession}</span>
-        </div>
 
       </div>
     </div>
