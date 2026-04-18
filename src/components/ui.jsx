@@ -1,4 +1,5 @@
 // Shared design primitives
+import { useState } from 'react'
 import { useTranslatedLabels } from '../lib/translate'
 
 // ─── Icons ────────────────────────────────────────────────
@@ -226,6 +227,13 @@ const GATE_DEFAULTS = {
 export function LanguageGate({ lang, setLang, languages, onContinue, geoAutoDetected, subtitle }) {
   const base = subtitle ? { ...GATE_DEFAULTS, subtitle } : GATE_DEFAULTS
   const t = useTranslatedLabels(base, lang)
+  const [search, setSearch] = useState('')
+  const filtered = search.trim()
+    ? languages.filter(l =>
+        l.label.toLowerCase().includes(search.toLowerCase()) ||
+        l.code.toLowerCase().includes(search.toLowerCase())
+      )
+    : languages
   return (
   <div style={{
     minHeight: '100dvh', background: 'var(--paper)',
@@ -243,13 +251,26 @@ export function LanguageGate({ lang, setLang, languages, onContinue, geoAutoDete
           {t.title}
         </h1>
         <p style={{
-          fontSize: 15, color: 'var(--ink-3)', margin: '0 0 28px',
+          fontSize: 15, color: 'var(--ink-3)', margin: '0 0 16px',
           lineHeight: 1.45, maxWidth: 320,
         }}>
           {t.subtitle}
         </p>
-        <div style={{ maxHeight: 340, overflowY: 'auto', marginRight: -4, paddingRight: 4 }}>
-          {languages.map(l => (
+        <input
+          type="search"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search languages…"
+          style={{
+            width: '100%', padding: '9px 12px', marginBottom: 12,
+            borderRadius: 10, border: '1px solid var(--line)',
+            background: 'var(--paper-2)', fontSize: 14,
+            color: 'var(--ink)', letterSpacing: '-0.01em',
+            boxSizing: 'border-box',
+          }}
+        />
+        <div style={{ maxHeight: 300, overflowY: 'auto', marginRight: -4, paddingRight: 4 }}>
+          {filtered.map(l => (
             <button
               key={l.code}
               onClick={() => setLang(l.code)}
