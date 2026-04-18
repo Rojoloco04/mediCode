@@ -23,6 +23,7 @@ const FORM_LABELS = {
   email: 'Email',
   emailHint: 'used to retrieve later',
   bloodType: 'Blood type',
+  optional: 'optional',
   allergies: 'Allergies',
   conditions: 'Conditions',
   medications: 'Current medications',
@@ -282,7 +283,7 @@ export default function MedicalForm() {
                 placeholder={labels.phName} required />
               <Field label={labels.email} name="email" type="email" value={form.email} onChange={handleChange}
                 placeholder={labels.phEmail} hint={labels.emailHint} />
-              <BloodPicker value={form.bloodType} onChange={v => setForm(f => ({ ...f, bloodType: v }))} />
+              <BloodPicker value={form.bloodType} onChange={v => setForm(f => ({ ...f, bloodType: v }))} label={labels.bloodType} optionalLabel={labels.optional} />
               <Field label={labels.allergies} name="allergies" value={form.allergies} onChange={handleChange}
                 placeholder={labels.phAllergies} />
             </div>

@@ -319,11 +319,11 @@ export const SectionHeader = ({ num, title, desc }) => (
 // ─── BloodPicker ──────────────────────────────────────────
 const BLOOD = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 
-export const BloodPicker = ({ value, onChange }) => (
+export const BloodPicker = ({ value, onChange, label = 'Blood type', optionalLabel = 'optional' }) => (
   <div>
     <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--ink-2)', display: 'block', marginBottom: 8 }}>
-      Blood type{' '}
-      <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>optional</span>
+      {label}{' '}
+      <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>{optionalLabel}</span>
     </label>
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
       {BLOOD.map(b => (
