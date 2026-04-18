@@ -1,18 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { translateFields } from '../lib/translate'
-
-const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'es', label: 'Español' },
-  { code: 'fr', label: 'Français' },
-  { code: 'ja', label: '日本語' },
-  { code: 'de', label: 'Deutsch' },
-  { code: 'zh', label: '中文' },
-  { code: 'ar', label: 'العربية' },
-  { code: 'pt', label: 'Português' },
-]
+import { translateFields, fetchLanguages } from '../lib/translate'
 
 const TRANSLATABLE = ['allergies', 'conditions', 'medications']
 
@@ -70,8 +59,15 @@ export default function InfoPage() {
   const [raw, setRaw] = useState(null)
   const [displayed, setDisplayed] = useState(null)
   const [lang, setLang] = useState('en')
+  const [languages, setLanguages] = useState([{ code: 'en', label: 'English' }])
   const [translating, setTranslating] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchLanguages()
+      .then((langs) => setLanguages([{ code: 'en', label: 'English' }, ...langs.filter((l) => l.code !== 'en')]))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     async function load() {
@@ -148,7 +144,7 @@ export default function InfoPage() {
           onChange={(e) => setLang(e.target.value)}
           className="text-sm bg-red-700 text-white border border-red-500 rounded-lg px-2 py-1 focus:outline-none"
         >
-          {LANGUAGES.map((l) => (
+          {languages.map((l) => (
             <option key={l.code} value={l.code}>{l.label}</option>
           ))}
         </select>

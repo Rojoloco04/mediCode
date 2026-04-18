@@ -1,10 +1,35 @@
-// MyMemory free API — no key needed, 5000 chars/day per IP
+function validateTranslation(translated) {
+  if (!translated || typeof translated !== 'string') return false
+  if (translated.trim() === '') return false
+  if (translated.startsWith('{') && translated.includes('error')) return false
+  return true
+}
+
+export async function fetchLanguages() {
+  const res = await fetch('/api/languages')
+  if (!res.ok) throw new Error(`Failed to fetch languages: ${res.status}`)
+  const json = await res.json()
+  if (!Array.isArray(json.languages)) throw new Error('Unexpected languages response shape')
+  return json.languages.map((l) => ({ code: l.language, label: l.name }))
+}
+
 export async function translateText(text, targetLang) {
   if (!text || targetLang === 'en') return text
-  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${targetLang}`
-  const res = await fetch(url)
+  const res = await fetch('/api/translate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, target: targetLang }),
+  })
+  if (!res.ok) {
+    console.warn(`Translation request failed (${res.status}) for lang=${targetLang}`)
+    return text
+  }
   const json = await res.json()
-  return json.responseData?.translatedText ?? text
+  if (!validateTranslation(json.translated)) {
+    console.warn('Translation output failed validation, using original', { text, got: json.translated })
+    return text
+  }
+  return json.translated
 }
 
 export async function translateFields(fields, targetLang) {
