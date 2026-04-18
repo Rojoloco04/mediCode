@@ -5,6 +5,15 @@ import { translateFields, fetchLanguages } from '../lib/translate'
 
 const TRANSLATABLE = ['allergies', 'conditions', 'medications']
 
+const UI_LABELS = {
+  patient: 'Patient',
+  allergies: 'Allergies',
+  bloodUnknown: 'Blood unknown',
+  conditions: 'Medical Conditions',
+  medications: 'Current Medications',
+  emergencyContact: 'Emergency Contact',
+}
+
 const DEMO_RESPONDER_IDS = new Set(['FR-001', 'FR-002', 'FR-999'])
 
 function AuthGate({ onAuthorized }) {
@@ -60,6 +69,7 @@ export default function InfoPage() {
   const [displayed, setDisplayed] = useState(null)
   const [lang, setLang] = useState('en')
   const [languages, setLanguages] = useState([{ code: 'en', label: 'English' }])
+  const [labels, setLabels] = useState(UI_LABELS)
   const [translating, setTranslating] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -96,13 +106,19 @@ export default function InfoPage() {
 
   useEffect(() => {
     if (!raw) return
-    if (lang === 'en') { setDisplayed(raw); return }
+    if (lang === 'en') { setDisplayed(raw); setLabels(UI_LABELS); return }
     setTranslating(true)
     const toTranslate = Object.fromEntries(
       TRANSLATABLE.filter((k) => raw[k]).map((k) => [k, raw[k]])
     )
-    translateFields(toTranslate, lang)
-      .then((translated) => setDisplayed({ ...raw, ...translated }))
+    Promise.all([
+      translateFields(toTranslate, lang),
+      translateFields(UI_LABELS, lang),
+    ])
+      .then(([translated, translatedLabels]) => {
+        setDisplayed({ ...raw, ...translated })
+        setLabels(translatedLabels)
+      })
       .finally(() => setTranslating(false))
   }, [lang, raw])
 
@@ -154,7 +170,7 @@ export default function InfoPage() {
         {/* Name + blood type hero */}
         <div className="bg-white rounded-2xl shadow-sm px-5 py-4 flex items-center justify-between">
           <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Patient</p>
+            <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">{labels.patient}</p>
             <p className="text-lg font-bold text-gray-900">{displayed.name}</p>
           </div>
           {displayed.bloodType ? (
@@ -163,7 +179,7 @@ export default function InfoPage() {
             </div>
           ) : (
             <div className="bg-gray-100 text-gray-400 text-xs font-medium rounded-xl w-14 h-14 flex items-center justify-center">
-              Blood<br/>unknown
+              {labels.bloodUnknown}
             </div>
           )}
         </div>
@@ -171,7 +187,7 @@ export default function InfoPage() {
         {/* Allergies — most critical, always prominent */}
         {displayed.allergies && (
           <div className="bg-red-50 border-2 border-red-400 rounded-2xl px-5 py-4">
-            <p className="text-xs font-bold text-red-500 uppercase tracking-widest mb-1">⚠ Allergies</p>
+            <p className="text-xs font-bold text-red-500 uppercase tracking-widest mb-1">⚠ {labels.allergies}</p>
             <p className="text-base font-semibold text-red-800">{displayed.allergies}</p>
           </div>
         )}
@@ -182,18 +198,18 @@ export default function InfoPage() {
 
         {/* Conditions */}
         {displayed.conditions && (
-          <InfoCard label="Medical Conditions" value={displayed.conditions} />
+          <InfoCard label={labels.conditions} value={displayed.conditions} />
         )}
 
         {/* Medications */}
         {displayed.medications && (
-          <InfoCard label="Current Medications" value={displayed.medications} />
+          <InfoCard label={labels.medications} value={displayed.medications} />
         )}
 
         {/* Emergency contact */}
         {(displayed.emergencyContact || displayed.emergencyPhone) && (
           <div className="bg-white rounded-2xl shadow-sm px-5 py-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Emergency Contact</p>
+            <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{labels.emergencyContact}</p>
             {displayed.emergencyContact && (
               <p className="text-sm font-semibold text-gray-800">{displayed.emergencyContact}</p>
             )}
