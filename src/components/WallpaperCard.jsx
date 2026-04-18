@@ -20,10 +20,22 @@ const WALLPAPER_LABELS = {
   download: 'Download Wallpaper (1080×2340)',
 }
 
+function buildOfflineQrValue(url, form) {
+  const lines = [url, '']
+  if (form.bloodType) lines.push(`Blood: ${form.bloodType}`)
+  if (form.allergies) lines.push(`Allergies: ${form.allergies}`)
+  if (form.conditions) lines.push(`Conditions: ${form.conditions}`)
+  if (form.medications) lines.push(`Meds: ${form.medications}`)
+  const contact = [form.emergencyContact, form.emergencyPhone].filter(Boolean).join(' ')
+  if (contact) lines.push(`Emergency: ${contact}`)
+  return lines.join('\n')
+}
+
 export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
   const cardRef = useRef(null)
   const [exporting, setExporting] = useState(false)
   const labels = useTranslatedLabels(WALLPAPER_LABELS, lang)
+  const offlineQrValue = buildOfflineQrValue(qrValue, form)
 
   async function handleDownload() {
     setExporting(true)
@@ -103,7 +115,7 @@ export default function WallpaperCard({ form, qrValue, lang = 'en' }) {
               </div>
             )}
             <div style={{ background: '#ffffff', padding: 4, borderRadius: 6 }}>
-              <QRCodeCanvas value={qrValue} size={72} />
+              <QRCodeCanvas value={offlineQrValue} size={72} />
             </div>
             <p style={{ fontSize: 8, color: '#6b7280', textAlign: 'center' }}>
               {labels.scanHint}

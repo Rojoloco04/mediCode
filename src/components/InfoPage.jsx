@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { translateFields, fetchLanguages, getLocationLanguage } from '../lib/translate'
 import { generateAlertAudio } from '../lib/elevenlabs'
@@ -30,6 +30,16 @@ const UI_LABELS = {
 }
 
 const ALERT_TEXT_EN = 'This person has been involved in a medical emergency.'
+
+function relativeTime(iso) {
+  if (!iso) return null
+  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
+  if (diff < 60) return 'Updated just now'
+  if (diff < 3600) return `Updated ${Math.floor(diff / 60)}m ago`
+  if (diff < 86400) return `Updated ${Math.floor(diff / 3600)}h ago`
+  const days = Math.floor(diff / 86400)
+  return `Updated ${days} day${days > 1 ? 's' : ''} ago`
+}
 
 const DEMO_RESPONDER_IDS = new Set(['FR-001', 'FR-002', 'FR-999'])
 
@@ -162,6 +172,7 @@ export default function InfoPage() {
           medications: data.medications,
           emergencyContact: data.emergency_contact,
           emergencyPhone: data.emergency_phone,
+          updatedAt: data.updated_at || null,
         }
         setRaw(profile)
         setDisplayed(profile)
@@ -257,10 +268,18 @@ export default function InfoPage() {
   if (!displayed) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center space-y-2">
-          <p className="text-4xl">🔍</p>
-          <p className="text-gray-700 font-medium">Profile not found</p>
-          <p className="text-gray-400 text-sm">This QR code may be invalid or expired.</p>
+        <div className="text-center space-y-4 max-w-xs">
+          <div className="text-6xl">🔍</div>
+          <div className="space-y-1">
+            <p className="text-xl font-bold text-gray-800">Profile not found</p>
+            <p className="text-gray-500 text-sm">This QR code may be invalid or the profile has been removed.</p>
+          </div>
+          <Link
+            to="/"
+            className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors"
+          >
+            Create a mediCode profile
+          </Link>
         </div>
       </div>
     )
@@ -289,6 +308,9 @@ export default function InfoPage() {
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">{labels.patient}</p>
             <p className="text-lg font-bold text-gray-900">{displayed.name}</p>
+            {displayed.updatedAt && (
+              <p className="text-xs text-gray-400 mt-0.5">{relativeTime(displayed.updatedAt)}</p>
+            )}
           </div>
           {displayed.bloodType ? (
             <div className="bg-red-600 text-white text-base font-bold rounded-xl w-16 h-16 flex items-center justify-center shadow">
